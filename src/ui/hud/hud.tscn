@@ -1,0 +1,53 @@
+[gd_scene format=3 uid="uid://sxbed12v2n6w"]
+
+[ext_resource type="Script" uid="uid://cgybqdh1bta48" path="res://src/ui/hud/hud.gd" id="1_cvkdw"]
+[ext_resource type="Script" uid="uid://cp2dbfvgqufvg" path="res://src/systems/scripts/start_button.gd" id="1_jobw0"]
+
+[node name="HUD" type="CanvasLayer" unique_id=1724181706]
+script = ExtResource("1_cvkdw")
+
+[node name="Timer" type="Timer" parent="." unique_id=407864996]
+wait_time = 1.5
+one_shot = true
+
+[node name="MarginContainer" type="MarginContainer" parent="." unique_id=889587914]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 4
+theme_override_constants/margin_top = 4
+theme_override_constants/margin_right = 4
+theme_override_constants/margin_bottom = 4
+
+[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer" unique_id=1603358540]
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 0
+
+[node name="ScoreLabel" type="Label" parent="MarginContainer/HBoxContainer" unique_id=1034145177]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 12
+text = "9999"
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer" unique_id=642841269]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+
+[node name="Message" type="Label" parent="MarginContainer/VBoxContainer" unique_id=1062929358]
+visible = false
+layout_mode = 2
+offset_transform_enabled = true
+theme_override_font_sizes/font_size = 12
+
+[node name="StartButton" type="Button" parent="MarginContainer/VBoxContainer" unique_id=330637616]
+layout_mode = 2
+offset_transform_enabled = true
+text = "START"
+script = ExtResource("1_jobw0")
+
+[connection signal="timeout" from="Timer" to="." method="_on_timer_timeout"]
+[connection signal="pressed" from="MarginContainer/VBoxContainer/StartButton" to="." method="_on_start_button_pressed"]

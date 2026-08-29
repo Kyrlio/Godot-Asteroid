@@ -6,18 +6,30 @@ extends Node2D
 @onready var rock_spawn: PathFollow2D = $RockPath/RockSpawn
 @onready var camera: CustomCamera = $Camera2D
 @onready var player: Player = $Player
+@onready var hud: HUD = $HUD
 
 
 var screen_size: Vector2 = Vector2.ZERO
-
+var level: int = 0
+var score: int = 0
+var playing: bool = false
 
 func _ready() -> void:
 	screen_size = get_viewport_rect().size
 	
+	Globals.freeze_requested.connect(freeze_engine)
 	Globals.camera = camera
 	
 	for i in 3:
 		spawn_rock(3)
+
+
+func _process(delta: float) -> void:
+	if not playing:
+		return
+	
+	if get_tree().get_nodes_in_group("rocks").size() == 0:
+		new_level()
 
 
 func spawn_rock(size: float, pos = null, vel = null) -> void:
@@ -32,6 +44,39 @@ func spawn_rock(size: float, pos = null, vel = null) -> void:
 	rock.start(pos, vel, size)
 	add_child.call_deferred(rock)
 	rock.exploded.connect(self._on_rock_exploded)
+
+
+func new_game() -> void:
+	get_tree().call_group("rocks", "queue_free")
+	level = 0
+	score = 0
+	hud.update_score(score)
+	hud.show_message("Get Ready!")
+	player.reset()
+	await $HUD/Timer.timeout
+	playing = true
+
+
+func game_over() -> void:
+	playing = false
+	hud.game_over()
+
+
+func new_level() -> void:
+	level += 1
+	hud.show_message("Wave %s" % level)
+	player.reset()
+	for i in level:
+		spawn_rock(3)
+
+
+func freeze_engine(freeze_slow: float = 0.06, freeze_time: float = 0.2) -> void:
+	if Engine.time_scale != 1.0:
+		return
+	
+	Engine.time_scale = freeze_slow
+	await get_tree().create_timer(freeze_time * freeze_slow).timeout
+	Engine.time_scale = 1.0
 
 
 func _on_rock_exploded(size: float, radius: float, pos: Vector2, vel: Vector2) -> void:

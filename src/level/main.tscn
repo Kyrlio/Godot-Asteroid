@@ -3,6 +3,7 @@
 [ext_resource type="Script" uid="uid://2m84vux85rbe" path="res://src/level/main.gd" id="1_ycmpe"]
 [ext_resource type="PackedScene" uid="uid://0hesj26uuje7" path="res://src/entities/rock/rock.tscn" id="2_ycmpe"]
 [ext_resource type="PackedScene" uid="uid://g60avxd8r2vt" path="res://src/entities/player/player.tscn" id="3_rmewx"]
+[ext_resource type="PackedScene" uid="uid://sxbed12v2n6w" path="res://src/ui/hud/hud.tscn" id="3_rwyyx"]
 [ext_resource type="Script" uid="uid://2emugclv6msv" path="res://src/systems/scripts/camera.gd" id="4_ycmpe"]
 
 [sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_0thxj"]
@@ -25,8 +26,8 @@ spread = 0.0
 initial_velocity_min = 10.0
 initial_velocity_max = 15.0
 gravity = Vector3(0, 0, 0)
-scale_min = 1.5
-scale_max = 2.5
+scale_min = 2.0
+scale_max = 2.0
 color = Color(0.8352941, 0.84705883, 0.81960785, 1)
 
 [sub_resource type="Curve2D" id="Curve2D_6c8sm"]
@@ -39,16 +40,18 @@ point_count = 5
 script = ExtResource("1_ycmpe")
 rock_scene = ExtResource("2_ycmpe")
 
+[node name="HUD" parent="." unique_id=1724181706 instance=ExtResource("3_rwyyx")]
+
 [node name="Starfield" type="GPUParticles2D" parent="." unique_id=1617967751]
 position = Vector2(165, 72)
-amount = 120
+amount = 50
 lifetime = 30.0
 preprocess = 20.0
 process_material = SubResource("ParticleProcessMaterial_0thxj")
 
 [node name="Starfield2" type="GPUParticles2D" parent="." unique_id=205590451]
 position = Vector2(165, 72)
-amount = 85
+amount = 25
 lifetime = 20.0
 preprocess = 20.0
 process_material = SubResource("ParticleProcessMaterial_af42n")
@@ -59,8 +62,11 @@ script = ExtResource("4_ycmpe")
 
 [node name="Player" parent="." unique_id=1248783488 instance=ExtResource("3_rmewx")]
 position = Vector2(80, 72)
+spin_power = 200
 
 [node name="RockPath" type="Path2D" parent="." unique_id=1817407202]
 curve = SubResource("Curve2D_6c8sm")
 
 [node name="RockSpawn" type="PathFollow2D" parent="RockPath" unique_id=763317020]
+
+[connection signal="start_game" from="HUD" to="." method="new_game"]

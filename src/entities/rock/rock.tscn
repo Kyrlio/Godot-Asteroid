@@ -7,6 +7,7 @@
 [ext_resource type="Texture2D" uid="uid://bmbv7gq734rph" path="res://assets/big_rock4.png" id="5_gvwf1"]
 [ext_resource type="Texture2D" uid="uid://bjh3c6nxbjb7j" path="res://assets/medium_rock.png" id="6_64q66"]
 [ext_resource type="Texture2D" uid="uid://5b2lxxn71rlc" path="res://assets/small_rock.png" id="7_5vyg6"]
+[ext_resource type="Texture2D" uid="uid://cmbn1hivywoms" path="res://assets/big_rock2.png" id="8_gvwf1"]
 
 [sub_resource type="PhysicsMaterial" id="PhysicsMaterial_vhl0w"]
 bounce = 1.0
@@ -85,6 +86,6 @@ libraries/ = SubResource("AnimationLibrary_vim8y")
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1163736213]
 
 [node name="Sprite2D" type="Sprite2D" parent="." unique_id=1528294173]
-texture = ExtResource("6_64q66")
+texture = ExtResource("8_gvwf1")
 hframes = 8
 region_rect = Rect2(0, 0, 135, 16)

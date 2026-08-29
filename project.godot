@@ -32,7 +32,7 @@ window/stretch/scale_mode="integer"
 
 [editor_plugins]
 
-enabled=PackedStringArray("res://addons/gdfxr/plugin.cfg", "res://addons/project-time-tracker/plugin.cfg")
+enabled=PackedStringArray("res://addons/gdfxr/plugin.cfg", "res://addons/project-time-tracker/plugin.cfg", "res://addons/trail_2d/plugin.cfg")
 
 [file_customization]
 
@@ -46,6 +46,11 @@ folder_colors={
 [global_group]
 
 rocks=""
+
+[gui]
+
+theme/custom="uid://cmw8ss20du1ws"
+theme/custom_font="uid://bgxp3me6ccm35"
 
 [input]
 
@@ -93,7 +98,7 @@ shoot={
 3d/physics_engine="Jolt Physics"
 2d/default_gravity=0.0
 2d/default_linear_damp=1.2000000000000002
-2d/default_angular_damp=7.0
+2d/default_angular_damp=8.0
 
 [rendering]
 

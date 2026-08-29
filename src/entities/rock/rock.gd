@@ -27,19 +27,16 @@ func start(_position: Vector2, _velocity: Vector2, _size: float) -> void:
 	match int(size):
 		3:
 			if not big_rock_textures.is_empty():
-				print("big")
 				chosen_texture = big_rock_textures.pick_random()
 				$Sprite2D.hframes = 8
 				anim_to_play = "default"
 		2:
 			if not medium_rock_textures.is_empty():
-				print('hu')
 				chosen_texture = medium_rock_textures.pick_random()
 				$Sprite2D.hframes = 8
 				anim_to_play = "default"
 		1:
 			if not small_rock_textures.is_empty():
-				print("huom")
 				chosen_texture = small_rock_textures.pick_random()
 				$Sprite2D.hframes = 4
 				anim_to_play = "small_rock"

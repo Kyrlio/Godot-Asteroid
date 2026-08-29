@@ -11,6 +11,7 @@ enum State {INIT, ALIVE, INVULNERABLE, DEAD}
 @export var spin_power: int = 180
 
 @export_group("Combat")
+@export var explosion_particles_scene: PackedScene
 @export var bullet_scene: PackedScene
 @export var fire_rate = 0.25
 
@@ -20,6 +21,7 @@ enum State {INIT, ALIVE, INVULNERABLE, DEAD}
 @onready var animation_player: AnimationPlayer = $AnimationPlayer
 @onready var gpu_particles: GPUParticles2D = $GPUParticles2D
 @onready var gpu_particles_2: GPUParticles2D = $GPUParticles2D2
+@onready var invulnerability_timer: Timer = $InvulnerabilityTimer
 
 var state: State = State.INIT
 var thrust: Vector2 = Vector2.ZERO
@@ -33,7 +35,12 @@ var lives: int = 3:
 	set(value):
 		lives = value
 		lives_changed.emit(lives)
+		queue_redraw()
 		if lives <= 0:
+			gpu_particles.emitting = false
+			gpu_particles_2.emitting = false
+			Globals.freeze_requested.emit(0.3, 2.5)
+			spawn_explosion_particles()
 			change_state(State.DEAD)
 		else:
 			change_state(State.INVULNERABLE)
@@ -56,6 +63,10 @@ func _physics_process(delta: float) -> void:
 
 
 func _integrate_forces(physics_state: PhysicsDirectBodyState2D) -> void:
+	if reset_pos:
+		physics_state.transform.origin = screen_size / 2.0
+		reset_pos = false
+	
 	var xform: Transform2D = physics_state.transform
 	xform.origin.x = wrapf(xform.origin.x, 0 - margin, screen_size.x + margin)
 	xform.origin.y = wrapf(xform.origin.y, 0 - margin, screen_size.y + margin)
@@ -73,6 +84,7 @@ func _draw() -> void:
 		var offset_pos = Vector2.RIGHT.rotated(angle) * radius
 		draw_circle(offset_pos, 1.2, color)
 
+
 func change_state(new_state: State) -> void:
 	match new_state:
 		State.INIT:
@@ -80,9 +92,14 @@ func change_state(new_state: State) -> void:
 		State.ALIVE:
 			collision_shape.set_deferred("disabled", false)
 		State.INVULNERABLE:
-			collision_shape.set_deferred("disabled", true)
+			#collision_shape.set_deferred("disabled", true)
+			_trigger_invincibility()
+			invulnerability_timer.start()
 		State.DEAD:
 			collision_shape.set_deferred("disabled", true)
+			$Sprite2D.hide()
+			linear_velocity = Vector2.ZERO
+			dead.emit()
 	
 	state = new_state
 
@@ -118,5 +135,42 @@ func shoot() -> void:
 	bullet.start(muzzle.global_transform)
 
 
+func spawn_explosion_particles() -> void:
+	var instance: GPUParticles2D = explosion_particles_scene.instantiate()
+	instance.global_position = global_position
+	get_tree().root.add_child(instance)
+	instance.restart()
+	instance.emitting = true
+
+
+func reset() -> void:
+	reset_pos = true
+	$Sprite2D.show()
+	lives = 3
+	change_state(State.ALIVE)
+
+
+func _trigger_invincibility() -> void:
+	var invincibility_duration: int = invulnerability_timer.wait_time
+	var flash_tween: Tween = create_tween().set_loops(int(invincibility_duration / 0.15))
+	flash_tween.tween_property($Sprite2D, "visible", false, 0.07)
+	flash_tween.tween_property($Sprite2D, "visible", true, 0.07)
+	
+	get_tree().create_timer(invincibility_duration).timeout.connect(func():
+		$Sprite2D.visible = true
+		)
+
+
 func _on_gun_cooldown_timeout() -> void:
 	can_shoot = true
+
+
+func _on_invulnerability_timer_timeout() -> void:
+	change_state(State.ALIVE)
+
+
+func _on_body_entered(body: Node) -> void:
+	if body.is_in_group("rocks"):
+		if state == State.ALIVE:
+			body.explode()
+			lives -= 1

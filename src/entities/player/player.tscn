@@ -3,6 +3,7 @@
 [ext_resource type="Texture2D" uid="uid://clkpeg3ojc5o6" path="res://assets/player2.png" id="1_4m8ck"]
 [ext_resource type="Script" uid="uid://s2ba3ygh1frk" path="res://src/entities/player/player.gd" id="1_vt6n5"]
 [ext_resource type="PackedScene" uid="uid://cwrbwwi7mmqpy" path="res://src/entities/bullet/bullet.tscn" id="2_muk8e"]
+[ext_resource type="PackedScene" uid="uid://c2nyj1krwgq5a" path="res://src/systems/particles/explosion_particles/explosion_particles.tscn" id="3_wrxq6"]
 
 [sub_resource type="Animation" id="Animation_muk8e"]
 length = 0.001
@@ -75,7 +76,10 @@ color_ramp = SubResource("GradientTexture1D_vt6n5")
 radius = 3.0
 
 [node name="Player" type="RigidBody2D" unique_id=1248783488]
+contact_monitor = true
+max_contacts_reported = 1
 script = ExtResource("1_vt6n5")
+explosion_particles_scene = ExtResource("3_wrxq6")
 bullet_scene = ExtResource("2_muk8e")
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=1628489405]
@@ -110,4 +114,10 @@ position = Vector2(5, 0)
 one_shot = true
 autostart = true
 
+[node name="InvulnerabilityTimer" type="Timer" parent="." unique_id=1381161391]
+wait_time = 2.0
+one_shot = true
+
+[connection signal="body_entered" from="." to="." method="_on_body_entered"]
 [connection signal="timeout" from="GunCooldown" to="." method="_on_gun_cooldown_timeout"]
+[connection signal="timeout" from="InvulnerabilityTimer" to="." method="_on_invulnerability_timer_timeout"]
