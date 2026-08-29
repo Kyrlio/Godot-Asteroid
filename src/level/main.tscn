@@ -1,0 +1,65 @@
+[gd_scene format=3 uid="uid://b1wedqyu22g16"]
+
+[ext_resource type="PackedScene" uid="uid://cr00a8a7injad" path="res://src/entities/player/player.tscn" id="1_la7um"]
+[ext_resource type="Script" uid="uid://c66qdkwrjkw6t" path="res://src/level/main.gd" id="1_xv147"]
+[ext_resource type="PackedScene" uid="uid://ci61jsmew21i7" path="res://src/entities/asteroid/asteroid.tscn" id="3_af42n"]
+[ext_resource type="Script" uid="uid://2emugclv6msv" path="res://src/scripts/camera.gd" id="4_mpbj7"]
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_0thxj"]
+particle_flag_disable_z = true
+emission_shape = 3
+emission_box_extents = Vector3(1, 72, 1)
+direction = Vector3(-1, 0, 0)
+spread = 0.0
+initial_velocity_min = 8.0
+initial_velocity_max = 10.0
+gravity = Vector3(0, 0, 0)
+color = Color(0.8352941, 0.84705883, 0.81960785, 1)
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_af42n"]
+particle_flag_disable_z = true
+emission_shape = 3
+emission_box_extents = Vector3(1, 72, 1)
+direction = Vector3(-1, 0, 0)
+spread = 0.0
+initial_velocity_min = 20.0
+initial_velocity_max = 30.0
+gravity = Vector3(0, 0, 0)
+scale_min = 1.5
+scale_max = 2.0
+color = Color(0.8352941, 0.84705883, 0.81960785, 1)
+
+[node name="Main" type="Node2D" unique_id=1510684246]
+script = ExtResource("1_xv147")
+asteroid_scene = ExtResource("3_af42n")
+
+[node name="Starfield" type="GPUParticles2D" parent="." unique_id=1617967751]
+position = Vector2(165, 72)
+amount = 120
+lifetime = 20.0
+preprocess = 20.0
+process_material = SubResource("ParticleProcessMaterial_0thxj")
+
+[node name="Starfield2" type="GPUParticles2D" parent="." unique_id=205590451]
+position = Vector2(165, 72)
+amount = 85
+lifetime = 20.0
+preprocess = 20.0
+process_material = SubResource("ParticleProcessMaterial_af42n")
+
+[node name="Player" parent="." unique_id=1083777500 instance=ExtResource("1_la7um")]
+position = Vector2(52, 56)
+rotation_acceleration = 26.0
+rotation_friction = 16.0
+
+[node name="Asteroids" type="Node2D" parent="." unique_id=370735558]
+
+[node name="Asteroid" parent="Asteroids" unique_id=1337078741 instance=ExtResource("3_af42n")]
+position = Vector2(123, 23)
+
+[node name="Asteroid3" parent="Asteroids" unique_id=1763244043 instance=ExtResource("3_af42n")]
+position = Vector2(21, 111)
+
+[node name="Camera2D" type="Camera2D" parent="." unique_id=1349519484]
+position = Vector2(80, 72)
+script = ExtResource("4_mpbj7")
