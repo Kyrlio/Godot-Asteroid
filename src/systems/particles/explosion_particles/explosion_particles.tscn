@@ -70,7 +70,7 @@ script = ExtResource("2_1gx72")
 [node name="GPUParticles2D" type="GPUParticles2D" parent="." unique_id=508930265]
 emitting = false
 amount = 12
-lifetime = 1.5
+lifetime = 1.1
 one_shot = true
 explosiveness = 0.9
 process_material = SubResource("ParticleProcessMaterial_7rxc2")

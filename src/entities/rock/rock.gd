@@ -5,26 +5,61 @@ signal exploded(size: float, radius: float, position: Vector2, linear_velocity: 
 
 @export var explosion_particles_scene: PackedScene
 
+@export_group("Textures")
+@export var big_rock_textures: Array[Texture2D]
+@export var medium_rock_textures: Array[Texture2D]
+@export var small_rock_textures: Array[Texture2D]
+
 var screen_size: Vector2 = Vector2.ZERO
 var size: float
 var radius: float
-var scale_factor: float = 0.2
+var scale_factor: float = 1.2
 
 
 func start(_position: Vector2, _velocity: Vector2, _size: float) -> void:
 	position = _position
 	size = _size
 	mass = 1.5 * size
-	$Sprite2D.scale = Vector2.ONE * scale_factor * size
 	
-	var sprite_width: float = $Sprite2D.region_rect.size.x if $Sprite2D.region_enabled else $Sprite2D.texture.get_size().x
+	var chosen_texture: Texture2D = null
+	$Sprite2D.frame = 0
+	var anim_to_play: String = "default"
+	match int(size):
+		3:
+			if not big_rock_textures.is_empty():
+				print("big")
+				chosen_texture = big_rock_textures.pick_random()
+				$Sprite2D.hframes = 8
+				anim_to_play = "default"
+		2:
+			if not medium_rock_textures.is_empty():
+				print('hu')
+				chosen_texture = medium_rock_textures.pick_random()
+				$Sprite2D.hframes = 8
+				anim_to_play = "default"
+		1:
+			if not small_rock_textures.is_empty():
+				print("huom")
+				chosen_texture = small_rock_textures.pick_random()
+				$Sprite2D.hframes = 4
+				anim_to_play = "small_rock"
+	
+	if chosen_texture:
+		$Sprite2D.texture = chosen_texture
+	
+	$AnimationPlayer.play(anim_to_play)
+	
+	$Sprite2D.scale = Vector2.ONE * scale_factor
+	
+	var texture_width: float = $Sprite2D.texture.get_size().x / $Sprite2D.hframes
+	var sprite_width: float = ($Sprite2D.region_rect.size.x / $Sprite2D.hframes) if $Sprite2D.region_enabled else texture_width
 	radius = int(sprite_width / 2.0 * $Sprite2D.scale.x)
 	
 	var shape: CircleShape2D = CircleShape2D.new()
 	shape.radius = radius
 	$CollisionShape2D.shape = shape
 	linear_velocity = _velocity
-	angular_velocity = randf_range(-PI, PI)
+	angular_velocity = randf_range(-PI / 3, PI / 3)
 
 
 func _integrate_forces(physics_state: PhysicsDirectBodyState2D) -> void:

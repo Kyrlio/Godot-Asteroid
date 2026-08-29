@@ -11,8 +11,8 @@ emission_shape = 3
 emission_box_extents = Vector3(1, 72, 1)
 direction = Vector3(-1, 0, 0)
 spread = 0.0
-initial_velocity_min = 8.0
-initial_velocity_max = 10.0
+initial_velocity_min = 4.0
+initial_velocity_max = 8.0
 gravity = Vector3(0, 0, 0)
 color = Color(0.8352941, 0.84705883, 0.81960785, 1)
 
@@ -22,11 +22,11 @@ emission_shape = 3
 emission_box_extents = Vector3(1, 72, 1)
 direction = Vector3(-1, 0, 0)
 spread = 0.0
-initial_velocity_min = 20.0
-initial_velocity_max = 30.0
+initial_velocity_min = 10.0
+initial_velocity_max = 15.0
 gravity = Vector3(0, 0, 0)
 scale_min = 1.5
-scale_max = 2.0
+scale_max = 2.5
 color = Color(0.8352941, 0.84705883, 0.81960785, 1)
 
 [sub_resource type="Curve2D" id="Curve2D_6c8sm"]
@@ -42,14 +42,14 @@ rock_scene = ExtResource("2_ycmpe")
 [node name="Starfield" type="GPUParticles2D" parent="." unique_id=1617967751]
 position = Vector2(165, 72)
 amount = 120
-lifetime = 20.0
+lifetime = 30.0
 preprocess = 20.0
 process_material = SubResource("ParticleProcessMaterial_0thxj")
 
 [node name="Starfield2" type="GPUParticles2D" parent="." unique_id=205590451]
 position = Vector2(165, 72)
 amount = 85
-lifetime = 10.0
+lifetime = 20.0
 preprocess = 20.0
 process_material = SubResource("ParticleProcessMaterial_af42n")
 
