@@ -1,8 +1,8 @@
-[gd_scene format=3 uid="uid://cr00a8a7injad"]
+[gd_scene format=3 uid="uid://g60avxd8r2vt"]
 
 [ext_resource type="Texture2D" uid="uid://clkpeg3ojc5o6" path="res://assets/player2.png" id="1_4m8ck"]
-[ext_resource type="Script" uid="uid://cmrc6yq23pa5v" path="res://src/entities/player/player.gd" id="1_vt6n5"]
-[ext_resource type="PackedScene" uid="uid://n2spk364x3mt" path="res://src/entities/laser/laser.tscn" id="2_muk8e"]
+[ext_resource type="Script" uid="uid://s2ba3ygh1frk" path="res://src/entities/player/player.gd" id="1_vt6n5"]
+[ext_resource type="PackedScene" uid="uid://cwrbwwi7mmqpy" path="res://src/entities/bullet/bullet.tscn" id="2_muk8e"]
 
 [sub_resource type="Animation" id="Animation_muk8e"]
 length = 0.001
@@ -36,14 +36,11 @@ tracks/0/keys = {
 "values": [Vector2(1, 1), Vector2(1.5, 0.835), Vector2(0.628, 1.165), Vector2(1, 1)]
 }
 
-[sub_resource type="AnimationLibrary" id="AnimationLibrary_ketdh"]
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_muk8e"]
 _data = {
 &"RESET": SubResource("Animation_muk8e"),
 &"shoot": SubResource("Animation_wrxq6")
 }
-
-[sub_resource type="CircleShape2D" id="CircleShape2D_0thxj"]
-radius = 3.6055515
 
 [sub_resource type="Gradient" id="Gradient_vt6n5"]
 offsets = PackedFloat32Array(0, 0.55136985)
@@ -52,14 +49,14 @@ colors = PackedColorArray(0.9019608, 0.7254902, 0.3529412, 1, 0.9019608, 0.72549
 [sub_resource type="GradientTexture1D" id="GradientTexture1D_vt6n5"]
 gradient = SubResource("Gradient_vt6n5")
 
-[sub_resource type="Curve" id="Curve_vt6n5"]
+[sub_resource type="Curve" id="Curve_muk8e"]
 _data = [Vector2(0, 0), 0.0, 0.0, 0, 0, Vector2(0.034591198, 1), 0.0, 0.0, 0, 0, Vector2(0.49685535, 1), 0.0, 0.0, 0, 0, Vector2(1, 0), 0.0, 0.0, 0, 0]
 point_count = 4
 
 [sub_resource type="CurveTexture" id="CurveTexture_x416w"]
-curve = SubResource("Curve_vt6n5")
+curve = SubResource("Curve_muk8e")
 
-[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_0thxj"]
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_wrxq6"]
 particle_flag_disable_z = true
 emission_shape = 3
 emission_box_extents = Vector3(1, 1.655, 1)
@@ -74,34 +71,43 @@ scale_max = 3.0
 scale_curve = SubResource("CurveTexture_x416w")
 color_ramp = SubResource("GradientTexture1D_vt6n5")
 
-[node name="Player" type="CharacterBody2D" unique_id=1083777500]
+[sub_resource type="CircleShape2D" id="CircleShape2D_ketdh"]
+radius = 3.0
+
+[node name="Player" type="RigidBody2D" unique_id=1248783488]
 script = ExtResource("1_vt6n5")
-laser_scene = ExtResource("2_muk8e")
+bullet_scene = ExtResource("2_muk8e")
 
-[node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=2007929403]
-libraries/ = SubResource("AnimationLibrary_ketdh")
+[node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=1628489405]
+libraries/ = SubResource("AnimationLibrary_muk8e")
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1768952394]
-rotation = -1.5707964
-shape = SubResource("CircleShape2D_0thxj")
-
-[node name="GPUParticles2D" type="GPUParticles2D" parent="." unique_id=1888491769]
+[node name="GPUParticles2D" type="GPUParticles2D" parent="." unique_id=265795613]
 position = Vector2(-4, 0)
 amount = 24
 lifetime = 0.6
 fixed_fps = 0
 interpolate = false
-process_material = SubResource("ParticleProcessMaterial_0thxj")
+process_material = SubResource("ParticleProcessMaterial_wrxq6")
 
-[node name="GPUParticles2D2" type="GPUParticles2D" parent="." unique_id=820678801]
+[node name="GPUParticles2D2" type="GPUParticles2D" parent="." unique_id=1000340756]
 position = Vector2(-3, 0)
 amount = 4
 lifetime = 0.4
 local_coords = true
-process_material = SubResource("ParticleProcessMaterial_0thxj")
+process_material = SubResource("ParticleProcessMaterial_wrxq6")
 
-[node name="Sprite2D" type="Sprite2D" parent="." unique_id=1430668772]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1220289205]
+rotation = -1.5707964
+shape = SubResource("CircleShape2D_ketdh")
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=1380703862]
 texture = ExtResource("1_4m8ck")
 
-[node name="Muzzle" type="Marker2D" parent="." unique_id=772944500]
+[node name="Muzzle" type="Marker2D" parent="." unique_id=1831816395]
 position = Vector2(5, 0)
+
+[node name="GunCooldown" type="Timer" parent="." unique_id=631506512]
+one_shot = true
+autostart = true
+
+[connection signal="timeout" from="GunCooldown" to="." method="_on_gun_cooldown_timeout"]

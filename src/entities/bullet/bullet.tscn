@@ -1,0 +1,25 @@
+[gd_scene format=3 uid="uid://cwrbwwi7mmqpy"]
+
+[ext_resource type="Script" uid="uid://cl7gvoawrklfx" path="res://src/entities/bullet/bullet.gd" id="1_smoiw"]
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_0thxj"]
+radius = 1.9999999
+height = 6.0
+
+[sub_resource type="CompressedTexture2D" id="CompressedTexture2D_k4vey"]
+load_path = "res://.godot/imported/laser.png-af9ca9427a51d96a36a733a4aa4be8b2.ctex"
+
+[node name="Bullet" type="Area2D" unique_id=1522123817]
+script = ExtResource("1_smoiw")
+
+[node name="VisibleOnScreenEnabler2D" type="VisibleOnScreenEnabler2D" parent="." unique_id=1670931263]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=2086398741]
+rotation = -1.5707964
+shape = SubResource("CapsuleShape2D_0thxj")
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=375946552]
+texture = SubResource("CompressedTexture2D_k4vey")
+
+[connection signal="body_entered" from="." to="." method="_on_body_entered"]
+[connection signal="screen_exited" from="VisibleOnScreenEnabler2D" to="." method="_on_visible_on_screen_enabler_2d_screen_exited"]

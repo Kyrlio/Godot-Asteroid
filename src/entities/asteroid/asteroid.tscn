@@ -2,6 +2,9 @@
 
 [ext_resource type="Texture2D" uid="uid://b3y2oukyporfn" path="res://assets/asteroids.png" id="1_kt371"]
 [ext_resource type="Script" uid="uid://b2opnhc6kd83q" path="res://src/entities/asteroid/asteroid.gd" id="1_xrjr5"]
+[ext_resource type="Script" uid="uid://co4dg42r4o5x7" path="res://src/systems/scripts/health_component.gd" id="2_yb58o"]
+[ext_resource type="Script" uid="uid://c3ie5mpmbd6f6" path="res://src/systems/scripts/hitbox_component.gd" id="3_s0e63"]
+[ext_resource type="Script" uid="uid://dsgrushnnvvik" path="res://src/systems/scripts/hurtbox_component.gd" id="4_nmshw"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_xrjr5"]
 resource_local_to_scene = true
@@ -9,6 +12,29 @@ radius = 14.0
 
 [node name="Asteroid" type="Area2D" unique_id=1337078741]
 script = ExtResource("1_xrjr5")
+
+[node name="HealthComponent" type="Node" parent="." unique_id=1825298601]
+script = ExtResource("2_yb58o")
+max_health = 1
+metadata/_custom_type_script = "uid://co4dg42r4o5x7"
+
+[node name="HitboxComponent" type="Area2D" parent="." unique_id=534175177]
+collision_layer = 0
+script = ExtResource("3_s0e63")
+metadata/_custom_type_script = "uid://c3ie5mpmbd6f6"
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="HitboxComponent" unique_id=1136634119]
+shape = SubResource("CircleShape2D_xrjr5")
+
+[node name="HurtboxComponent" type="Area2D" parent="." unique_id=1067881319 node_paths=PackedStringArray("health_component")]
+collision_layer = 4
+collision_mask = 0
+script = ExtResource("4_nmshw")
+health_component = NodePath("../HealthComponent")
+metadata/_custom_type_script = "uid://dsgrushnnvvik"
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="HurtboxComponent" unique_id=879548245]
+shape = SubResource("CircleShape2D_xrjr5")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=220510201]
 shape = SubResource("CircleShape2D_xrjr5")

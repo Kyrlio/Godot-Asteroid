@@ -1,0 +1,56 @@
+[gd_scene format=3 uid="uid://dtr5lw5ocrg3p"]
+
+[ext_resource type="Texture2D" uid="uid://18j7cf2ij5nf" path="res://assets/fx/particles.png" id="1_jy0yx"]
+[ext_resource type="Script" uid="uid://d0736d81qltlo" path="res://src/systems/scripts/self_freeing_particles.gd" id="1_x4ywy"]
+
+[sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_ft8sa"]
+particles_animation = true
+particles_anim_h_frames = 4
+particles_anim_v_frames = 1
+particles_anim_loop = false
+
+[sub_resource type="Gradient" id="Gradient_xetn1"]
+offsets = PackedFloat32Array(0)
+colors = PackedColorArray(0.91764706, 0.19607843, 0.23529412, 1)
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_ts6d3"]
+gradient = SubResource("Gradient_xetn1")
+
+[sub_resource type="Curve" id="Curve_ajheh"]
+_data = [Vector2(0.034383953, 0), 0.0, 0.0, 0, 0, Vector2(0.26647562, 1), 0.0, 0.0, 0, 0, Vector2(0.49283665, 1), 0.0, 0.0, 0, 0, Vector2(1, 0), -5.1582785, 0.0, 0, 0]
+point_count = 4
+
+[sub_resource type="CurveTexture" id="CurveTexture_ovpnb"]
+curve = SubResource("Curve_ajheh")
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_yd353"]
+lifetime_randomness = 0.28
+particle_flag_disable_z = true
+angle_min = -720.0
+angle_max = 720.0
+direction = Vector3(0, -1, 0)
+spread = 60.0
+initial_velocity_min = 75.0
+initial_velocity_max = 150.0
+angular_velocity_min = -720.0
+angular_velocity_max = 719.99994
+gravity = Vector3(0, 700, 0)
+scale_min = 0.19999999
+scale_max = 0.29999998
+scale_curve = SubResource("CurveTexture_ovpnb")
+color_initial_ramp = SubResource("GradientTexture1D_ts6d3")
+anim_offset_max = 1.0
+
+[node name="EnemyHitParticles" type="GPUParticles2D" unique_id=902664498]
+material = SubResource("CanvasItemMaterial_ft8sa")
+scale = Vector2(1.3052791, 1.1254275)
+emitting = false
+amount = 4
+texture = ExtResource("1_jy0yx")
+lifetime = 0.4
+one_shot = true
+explosiveness = 0.8
+fixed_fps = 0
+interpolate = false
+process_material = SubResource("ParticleProcessMaterial_yd353")
+script = ExtResource("1_x4ywy")

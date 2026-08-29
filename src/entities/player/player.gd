@@ -1,113 +1,122 @@
 class_name Player
-extends CharacterBody2D
+extends RigidBody2D
 
-signal died
+signal lives_changed(lives: int)
+signal dead
 
-@export var laser_scene: PackedScene
-@export var fire_cooldown: float = 0.25
+enum State {INIT, ALIVE, INVULNERABLE, DEAD}
 
-@export_group("Linear Movement")
-@export var max_speed: float = 50.0
-@export var acceleration: float = 75.0
-@export var friction: float = 25.0
+@export_group("Movement")
+@export var engine_power: int = 150
+@export var spin_power: int = 180
 
-@export_group("Angular Movement")
-@export var max_rotation_speed: float = 4.5
-@export var rotation_acceleration: float = 18.0
-@export var rotation_friction: float = 14.0
+@export_group("Combat")
+@export var bullet_scene: PackedScene
+@export var fire_rate = 0.25
 
-@onready var sprite: Sprite2D = $Sprite2D
 @onready var collision_shape: CollisionShape2D = $CollisionShape2D
-@onready var gpu_particles: GPUParticles2D = $GPUParticles2D
-@onready var gpu_particles_2: GPUParticles2D = $GPUParticles2D2
+@onready var gun_cooldown: Timer = $GunCooldown
 @onready var muzzle: Marker2D = $Muzzle
 @onready var animation_player: AnimationPlayer = $AnimationPlayer
+@onready var gpu_particles: GPUParticles2D = $GPUParticles2D
+@onready var gpu_particles_2: GPUParticles2D = $GPUParticles2D2
 
-var alive: bool = true
-var screen_size: Vector2
-var margin: float = 8.0
-var rotation_velocity: float = 0.0
+var state: State = State.INIT
+var thrust: Vector2 = Vector2.ZERO
+var rotation_dir: float = 0.0
+var margin: float = 4.0
+var screen_size: Vector2 = Vector2.ZERO
 var can_shoot: bool = true
-
+var reset_pos: bool = false
+var orbit_angle: float = 0.0
+var lives: int = 3:
+	set(value):
+		lives = value
+		lives_changed.emit(lives)
+		if lives <= 0:
+			change_state(State.DEAD)
+		else:
+			change_state(State.INVULNERABLE)
 
 func _ready() -> void:
+	change_state(State.ALIVE)
 	screen_size = get_viewport_rect().size
+	gun_cooldown.wait_time = fire_rate
+
+
+func _process(delta: float) -> void:
+	get_input()
+	orbit_angle += 3.0 * delta
+	queue_redraw()
 
 
 func _physics_process(delta: float) -> void:
-	if not alive:
+	constant_force = thrust
+	constant_torque = rotation_dir * spin_power
+
+
+func _integrate_forces(physics_state: PhysicsDirectBodyState2D) -> void:
+	var xform: Transform2D = physics_state.transform
+	xform.origin.x = wrapf(xform.origin.x, 0 - margin, screen_size.x + margin)
+	xform.origin.y = wrapf(xform.origin.y, 0 - margin, screen_size.y + margin)
+	physics_state.transform = xform
+
+
+func _draw() -> void:
+	if state == State.DEAD: return
+	
+	var color = Color(0.902, 0.725, 0.353, 1.0)
+	var radius = 8.0
+	
+	for i in range(lives):
+		var angle = orbit_angle - rotation + (i * (TAU / max(lives, 1)))
+		var offset_pos = Vector2.RIGHT.rotated(angle) * radius
+		draw_circle(offset_pos, 1.2, color)
+
+func change_state(new_state: State) -> void:
+	match new_state:
+		State.INIT:
+			collision_shape.set_deferred("disabled", true)
+		State.ALIVE:
+			collision_shape.set_deferred("disabled", false)
+		State.INVULNERABLE:
+			collision_shape.set_deferred("disabled", true)
+		State.DEAD:
+			collision_shape.set_deferred("disabled", true)
+	
+	state = new_state
+
+
+func get_input() -> void:
+	thrust = Vector2.ZERO
+	if state in [State.DEAD, State.INIT]:
 		return
-	
-	# Rotation
-	var rotation_input: float = Input.get_axis("rotate_left", "rotate_right")
-	if rotation_input != 0:
-		rotation_velocity += rotation_input * rotation_acceleration * delta
-		rotation_velocity = clamp(rotation_velocity, -max_rotation_speed, max_rotation_speed)
-	else:
-		rotation_velocity = move_toward(rotation_velocity, 0.0, rotation_friction * delta)
-	rotation += rotation_velocity * delta
-	
-	# Linear Acceleration
-	var thrust_input: float = Input.is_action_pressed("move_forward")
-	if thrust_input:
+	if Input.is_action_pressed("move_forward"):
+		thrust = transform.x * engine_power
 		if not gpu_particles.emitting:
 			gpu_particles.emitting = true
 			gpu_particles_2.emitting = true
-		var forward_vector := Vector2.RIGHT.rotated(rotation)
-		velocity += forward_vector * acceleration * delta
-		velocity = velocity.limit_length(max_speed)
 	else:
 		if gpu_particles.emitting:
 			gpu_particles.emitting = false
 			gpu_particles_2.emitting = false
-		velocity = velocity.move_toward(Vector2.ZERO, friction * delta)
+	rotation_dir = Input.get_axis("rotate_left", "rotate_right")
 	
 	if Input.is_action_pressed("shoot") and can_shoot:
-		_shoot()
-	
-	move_and_slide()
-	_screen_wrap()
+		shoot()
 
 
-func _shoot() -> void:
-	if animation_player.is_playing():
-		animation_player.stop()
-	animation_player.play("shoot")
-	Globals.camera.shake(0.12, 30.0, 1.0)
+func shoot() -> void:
+	if state == State.INVULNERABLE:
+		return
 	can_shoot = false
-	var laser: Area2D = laser_scene.instantiate()
-	laser.global_position = muzzle.global_position
-	laser.rotation = rotation
-	
-	get_tree().current_scene.add_child(laser)
-	
-	await get_tree().create_timer(fire_cooldown).timeout
+	gun_cooldown.start()
+	Globals.camera.shake(0.15, 30.0, 2.0)
+	animation_player.play("shoot")
+	var bullet: Bullet = bullet_scene.instantiate()
+	get_tree().root.add_child(bullet)
+	bullet.start(muzzle.global_transform)
+
+
+func _on_gun_cooldown_timeout() -> void:
 	can_shoot = true
-
-
-func _screen_wrap() -> void:
-	if global_position.x < -margin:
-		global_position.x = screen_size.x + margin
-	elif global_position.x > screen_size.x + margin:
-		global_position.x = -margin
-	
-	if global_position.y < -margin:
-		global_position.y = screen_size.y + margin
-	elif global_position.y > screen_size.y + margin:
-		global_position.y = -margin
-
-
-func die() -> void:
-	if alive:
-		alive = false
-		collision_shape.set_deferred("disabled", true)
-		sprite.visible = false
-		died.emit()
-
-
-func respawn(spawn_position: Vector2) -> void:
-	alive = true
-	global_position = spawn_position
-	velocity = Vector2.ZERO
-	sprite.visible = true
-	collision_shape.set_deferred("disabled", false)

@@ -34,6 +34,19 @@ window/stretch/scale_mode="integer"
 
 enabled=PackedStringArray("res://addons/gdfxr/plugin.cfg", "res://addons/project-time-tracker/plugin.cfg")
 
+[file_customization]
+
+folder_colors={
+"res://assets/": "green",
+"res://src/": "purple",
+"res://src/entities/": "blue",
+"res://src/level/": "red"
+}
+
+[global_group]
+
+rocks=""
+
 [input]
 
 rotate_left={
@@ -67,9 +80,20 @@ shoot={
 ]
 }
 
+[layer_names]
+
+2d_physics/layer_1="Player Hurtbox"
+2d_physics/layer_2="Player Hitbox"
+2d_physics/layer_3="Asteroid Hurtbox"
+2d_physics/layer_4="Asteroid Hitbox"
+2d_physics/layer_5="Upgrades"
+
 [physics]
 
 3d/physics_engine="Jolt Physics"
+2d/default_gravity=0.0
+2d/default_linear_damp=1.2000000000000002
+2d/default_angular_damp=7.0
 
 [rendering]
 

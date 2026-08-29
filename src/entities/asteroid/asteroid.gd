@@ -13,9 +13,12 @@ var margin: float = 16.0
 
 @onready var sprite: Sprite2D = $Sprite2D
 @onready var collision_shape: CollisionShape2D = $CollisionShape2D
+@onready var health_component: HealthComponent = $HealthComponent
 
 
 func _ready() -> void:
+	health_component.died.connect(_on_died)
+	
 	screen_size = get_viewport_rect().size
 	
 	if direction == Vector2.ZERO:
@@ -24,29 +27,34 @@ func _ready() -> void:
 	else:
 		rotation = direction.angle()
 	
-	collision_shape.shape = collision_shape.shape.duplicate()
-	
-	match size:
-		AsteroidSize.LARGE:
-			speed = randf_range(5.0, 10.0)
-			scale = Vector2(1.0, 1.0)
-			sprite.region_rect = Rect2(37.0, 1.0, 29.0, 26.0)
-			collision_shape.shape.radius = 14.0
-		AsteroidSize.MEDIUM:
-			speed = randf_range(15.0, 25.0)
-			scale = Vector2(1.0, 1.0)
-			sprite.region_rect = Rect2(73.0, 1.0, 15.0, 13.0)
-			collision_shape.shape.radius = 7.0
-		AsteroidSize.SMALL:
-			speed = randf_range(30.0, 40.0)
-			scale = Vector2(1.0, 1.0)
-			sprite.region_rect = Rect2(95.0, 0.0, 8.0, 7.0)
-			collision_shape.shape.radius = 4.0
+	_configure_stats_by_size()
 
 
 func _physics_process(delta: float) -> void:
 	global_position += direction * speed * delta
 	_screen_wrap()
+
+
+func _configure_stats_by_size() -> void:
+	#collision_shape.shape = collision_shape.shape.duplicate()
+	match size:
+		AsteroidSize.LARGE:
+			speed = randf_range(5.0, 10.0)
+			scale = Vector2(1.0, 1.0)
+			sprite.region_rect = Rect2(37.0, 1.0, 29.0, 26.0)
+			collision_shape.shape.radius = 13.0
+		AsteroidSize.MEDIUM:
+			speed = randf_range(15.0, 25.0)
+			scale = Vector2(1.0, 1.0)
+			sprite.region_rect = Rect2(73.0, 1.0, 15.0, 13.0)
+			collision_shape.shape.radius = 6.0
+		AsteroidSize.SMALL:
+			speed = randf_range(30.0, 40.0)
+			scale = Vector2(1.0, 1.0)
+			sprite.region_rect = Rect2(95.0, 0.0, 8.0, 7.0)
+			collision_shape.shape.radius = 4.0
+	
+	health_component.current_health = health_component.max_health
 
 
 func _screen_wrap() -> void:
@@ -59,6 +67,11 @@ func _screen_wrap() -> void:
 		global_position.y = screen_size.y + margin
 	elif global_position.y > screen_size.y + margin:
 		global_position.y = -margin
+
+
+func _on_died() -> void:
+	var hit_direction: Vector2 = health_component.last_hit_direction
+	destroy(hit_direction)
 
 
 func destroy(hit_direction: Vector2 = Vector2.ZERO) -> void:

@@ -1,0 +1,35 @@
+[gd_scene format=3 uid="uid://dat7ey8msettp"]
+
+[ext_resource type="Script" uid="uid://co4dg42r4o5x7" path="res://src/systems/scripts/health_component.gd" id="1_ht0gf"]
+[ext_resource type="Script" uid="uid://b3t5qvwbwssou" path="res://src/entities/upgrade pod/upgrade_pod.gd" id="1_ofhym"]
+[ext_resource type="Texture2D" uid="uid://b3y2oukyporfn" path="res://assets/asteroids.png" id="2_ofhym"]
+[ext_resource type="Script" uid="uid://dsgrushnnvvik" path="res://src/systems/scripts/hurtbox_component.gd" id="3_n2dny"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_0thxj"]
+radius = 14.0
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_x416w"]
+radius = 7.0
+
+[node name="UpgradePod" type="Area2D" unique_id=1123512363]
+script = ExtResource("1_ofhym")
+
+[node name="HealthComponent" type="Node" parent="." unique_id=306228338]
+script = ExtResource("1_ht0gf")
+metadata/_custom_type_script = "uid://co4dg42r4o5x7"
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=487531580]
+texture = ExtResource("2_ofhym")
+region_enabled = true
+region_rect = Rect2(73, 1, 15, 13)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1256538864]
+shape = SubResource("CircleShape2D_0thxj")
+
+[node name="HurtboxComponent" type="Area2D" parent="." unique_id=1527522832]
+script = ExtResource("3_n2dny")
+metadata/_custom_type_script = "uid://dsgrushnnvvik"
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="HurtboxComponent" unique_id=64464330]
+shape = SubResource("CircleShape2D_x416w")
+debug_color = Color(0.9717571, 0, 0.4490255, 0.41960785)

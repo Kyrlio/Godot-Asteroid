@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="UpgradeData" format=3 uid="uid://cuf0u3n2gsdpw"]
+
+[ext_resource type="Script" uid="uid://dshclrbo72gov" path="res://src/systems/scripts/upgrade_data.gd" id="1_6aje6"]
+[ext_resource type="Texture2D" uid="uid://b15i2ltoy7lvt" path="res://assets/laser.png" id="2_ndmpg"]
+
+[resource]
+script = ExtResource("1_6aje6")
+id = "double_laser"
+name = "Double Laser"
+description = "Your ship shoots now 2 lasers instead of one !"
+texture = ExtResource("2_ndmpg")
+metadata/_custom_type_script = "uid://dshclrbo72gov"

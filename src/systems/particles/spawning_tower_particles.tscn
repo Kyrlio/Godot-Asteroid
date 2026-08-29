@@ -1,0 +1,63 @@
+[gd_scene format=3 uid="uid://c3nknj7k1rrw"]
+
+[ext_resource type="Texture2D" uid="uid://18j7cf2ij5nf" path="res://assets/fx/particles.png" id="1_jncxc"]
+[ext_resource type="Script" uid="uid://d0736d81qltlo" path="res://src/systems/scripts/self_freeing_particles.gd" id="2_hrkyt"]
+[ext_resource type="Texture2D" uid="uid://cxpp8obwks88q" path="res://assets/Towers/Combat Towers/spr_tower.png" id="2_lvlf3"]
+[ext_resource type="Texture2D" uid="uid://nj6lnkh1wpso" path="res://assets/Towers/Combat Towers/spr_tower_archer.png" id="4_lvlf3"]
+
+[sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_0thxj"]
+particles_animation = true
+particles_anim_h_frames = 4
+particles_anim_v_frames = 1
+particles_anim_loop = false
+
+[sub_resource type="Gradient" id="Gradient_uedxk"]
+offsets = PackedFloat32Array(0, 0.5833333, 1)
+colors = PackedColorArray(1, 1, 1, 1, 0.7058824, 0.7058824, 0.7058824, 1, 0.7058824, 0.7058824, 0.7058824, 0)
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_5nt3a"]
+gradient = SubResource("Gradient_uedxk")
+
+[sub_resource type="Curve" id="Curve_o4gce"]
+_data = [Vector2(1e-05, 0), 0.0, 0.0, 0, 0, Vector2(0.05339805, 1), 0.0, 0.0, 0, 0, Vector2(1, 0), 0.0, 0.0, 0, 0]
+point_count = 3
+
+[sub_resource type="CurveTexture" id="CurveTexture_f72hx"]
+curve = SubResource("Curve_o4gce")
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_x416w"]
+lifetime_randomness = 0.24
+particle_flag_disable_z = true
+emission_shape = 3
+emission_box_extents = Vector3(10, 1, 1)
+direction = Vector3(0, -1, 0)
+spread = 76.579
+initial_velocity_min = 5.0
+initial_velocity_max = 10.0
+scale_min = 0.39999998
+scale_max = 0.79999995
+scale_curve = SubResource("CurveTexture_f72hx")
+color_ramp = SubResource("GradientTexture1D_5nt3a")
+
+[node name="GPUParticles2D" type="GPUParticles2D" unique_id=198808913]
+material = SubResource("CanvasItemMaterial_0thxj")
+position = Vector2(0, 2)
+emitting = false
+amount = 24
+texture = ExtResource("1_jncxc")
+lifetime = 1.4000000000000001
+one_shot = true
+explosiveness = 0.85
+process_material = SubResource("ParticleProcessMaterial_x416w")
+script = ExtResource("2_hrkyt")
+
+[node name="SprTower" type="Sprite2D" parent="." unique_id=445950239]
+visible = false
+show_behind_parent = true
+position = Vector2(0, -15)
+texture = ExtResource("2_lvlf3")
+
+[node name="SprTowerArcher" type="Sprite2D" parent="." unique_id=66004188]
+visible = false
+position = Vector2(0, -12)
+texture = ExtResource("4_lvlf3")
