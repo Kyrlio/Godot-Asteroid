@@ -14,14 +14,29 @@ var level: int = 0
 var score: int = 0
 var playing: bool = false
 
+
+func _input(event: InputEvent) -> void:
+	if event.is_action_pressed("pause"):
+		if not playing:
+			return
+		get_tree().paused = not get_tree().paused
+		var message = $HUD/MarginContainer/VBoxContainer/Message
+		if get_tree().paused:
+			message.text = "Paused"
+			message.show()
+		else:
+			message.text = ""
+			message.hide()
+
+
 func _ready() -> void:
 	screen_size = get_viewport_rect().size
 	
 	Globals.freeze_requested.connect(freeze_engine)
 	Globals.camera = camera
 	
-	for i in 3:
-		spawn_rock(3)
+	player.hide()
+	$HUD/MarginContainer/VBoxContainer/StartButton.grab_focus()
 
 
 func _process(delta: float) -> void:
@@ -47,6 +62,7 @@ func spawn_rock(size: float, pos = null, vel = null) -> void:
 
 
 func new_game() -> void:
+	player.show()
 	get_tree().call_group("rocks", "queue_free")
 	level = 0
 	score = 0

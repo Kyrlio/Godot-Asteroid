@@ -37,6 +37,7 @@ _data = {
 point_count = 5
 
 [node name="Main" type="Node2D" unique_id=1510684246]
+process_mode = 3
 script = ExtResource("1_ycmpe")
 rock_scene = ExtResource("2_ycmpe")
 
@@ -61,6 +62,7 @@ position = Vector2(80, 72)
 script = ExtResource("4_ycmpe")
 
 [node name="Player" parent="." unique_id=1248783488 instance=ExtResource("3_rmewx")]
+visible = false
 position = Vector2(80, 72)
 spin_power = 200
 
@@ -70,3 +72,4 @@ curve = SubResource("Curve2D_6c8sm")
 [node name="RockSpawn" type="PathFollow2D" parent="RockPath" unique_id=763317020]
 
 [connection signal="start_game" from="HUD" to="." method="new_game"]
+[connection signal="dead" from="Player" to="." method="game_over"]
