@@ -29,6 +29,7 @@ size_flags_vertical = 0
 [node name="ScoreLabel" type="Label" parent="MarginContainer/HBoxContainer" unique_id=1034145177]
 layout_mode = 2
 size_flags_horizontal = 3
+offset_transform_enabled = true
 theme_override_font_sizes/font_size = 12
 text = "9999"
 

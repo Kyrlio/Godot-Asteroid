@@ -2,6 +2,7 @@
 
 [ext_resource type="Script" uid="uid://2m84vux85rbe" path="res://src/level/main.gd" id="1_ycmpe"]
 [ext_resource type="PackedScene" uid="uid://0hesj26uuje7" path="res://src/entities/rock/rock.tscn" id="2_ycmpe"]
+[ext_resource type="PackedScene" uid="uid://dfa0fkw6vuq75" path="res://src/entities/enemy/enemy.tscn" id="3_8hnqi"]
 [ext_resource type="PackedScene" uid="uid://g60avxd8r2vt" path="res://src/entities/player/player.tscn" id="3_rmewx"]
 [ext_resource type="PackedScene" uid="uid://sxbed12v2n6w" path="res://src/ui/hud/hud.tscn" id="3_rwyyx"]
 [ext_resource type="Script" uid="uid://2emugclv6msv" path="res://src/systems/scripts/camera.gd" id="4_ycmpe"]
@@ -40,8 +41,12 @@ point_count = 5
 process_mode = 3
 script = ExtResource("1_ycmpe")
 rock_scene = ExtResource("2_ycmpe")
+enemy_scene = ExtResource("3_8hnqi")
 
 [node name="HUD" parent="." unique_id=1724181706 instance=ExtResource("3_rwyyx")]
+
+[node name="EnemyTimer" type="Timer" parent="." unique_id=1724273549]
+one_shot = true
 
 [node name="Starfield" type="GPUParticles2D" parent="." unique_id=1617967751]
 position = Vector2(165, 72)
@@ -72,4 +77,5 @@ curve = SubResource("Curve2D_6c8sm")
 [node name="RockSpawn" type="PathFollow2D" parent="RockPath" unique_id=763317020]
 
 [connection signal="start_game" from="HUD" to="." method="new_game"]
+[connection signal="timeout" from="EnemyTimer" to="." method="_on_enemy_timer_timeout"]
 [connection signal="dead" from="Player" to="." method="game_over"]

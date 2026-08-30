@@ -56,7 +56,7 @@ func start(_position: Vector2, _velocity: Vector2, _size: float) -> void:
 	shape.radius = radius
 	$CollisionShape2D.shape = shape
 	linear_velocity = _velocity
-	angular_velocity = randf_range(-PI / 3, PI / 3)
+	angular_velocity = randf_range(-PI / 2, PI / 2)
 
 
 func _integrate_forces(physics_state: PhysicsDirectBodyState2D) -> void:

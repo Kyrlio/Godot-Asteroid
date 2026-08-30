@@ -7,6 +7,11 @@ signal start_game
 @onready var start_button: Button = $MarginContainer/VBoxContainer/StartButton
 @onready var score_label: Label = $MarginContainer/HBoxContainer/ScoreLabel
 
+var old_score: int = 0
+var score_tween: Tween
+
+func _ready() -> void:
+	score_label.text = "0"
 
 func show_message(text: String) -> void:
 	message.text = text
@@ -18,7 +23,23 @@ func show_message(text: String) -> void:
 
 
 func update_score(value: int) -> void:
-	score_label.text = str(value)
+	if score_tween and score_tween.is_running():
+		score_tween.kill()
+	
+	score_label.pivot_offset = score_label.size / 2.0
+	
+	score_tween = create_tween().set_parallel(true)
+	score_tween.tween_method(
+		func(val: int): score_label.text = str(val), 
+		old_score, 
+		value, 
+		0.4
+	).set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_CUBIC)
+	
+	score_tween.tween_property(score_label, "offset_transform_scale", Vector2(1.2, 1.2), 0.2).set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_ELASTIC)
+	score_tween.chain().tween_property(score_label, "offset_transform_scale", Vector2.ONE, 0.6).set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_ELASTIC)
+	
+	old_score = value
 
 
 func game_over() -> void:

@@ -13,8 +13,10 @@ config_version=5
 config/name="GBJAM Asteroids"
 run/main_scene="uid://b1wedqyu22g16"
 config/features=PackedStringArray("4.7", "GL Compatibility")
+boot_splash/bg_color=Color(0.13725491, 0.22352941, 0.2, 1)
 boot_splash/use_filter=false
-config/icon="res://icon.svg"
+boot_splash/image="uid://uw215l8k0s2o"
+config/icon="uid://uw215l8k0s2o"
 
 [autoload]
 
@@ -46,6 +48,7 @@ folder_colors={
 [global_group]
 
 rocks=""
+enemies=""
 
 [gui]
 

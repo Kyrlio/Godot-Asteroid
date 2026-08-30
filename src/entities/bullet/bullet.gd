@@ -2,6 +2,7 @@ class_name Bullet
 extends Area2D
 
 @export var speed: float = 180.0
+@export var hit_particles_scene: PackedScene
 
 var velocity: Vector2 = Vector2.ZERO
 
@@ -15,6 +16,14 @@ func _process(delta: float) -> void:
 	position += velocity * delta
 
 
+func spawn_hit_particles() -> void:
+	var instance: GPUParticles2D = hit_particles_scene.instantiate()
+	instance.global_position = global_position
+	get_tree().root.add_child(instance)
+	instance.restart()
+	instance.emitting = true
+
+
 func _on_visible_on_screen_enabler_2d_screen_exited() -> void:
 	queue_free()
 
@@ -22,4 +31,12 @@ func _on_visible_on_screen_enabler_2d_screen_exited() -> void:
 func _on_body_entered(body: Node2D) -> void:
 	if body.is_in_group("rocks"):
 		body.explode()
+		spawn_hit_particles()
 		queue_free()
+
+
+func _on_area_entered(area: Area2D) -> void:
+	if area.is_in_group("enemies"):
+		area.take_damage(1)
+		spawn_hit_particles()
+		queue_free.call_deferred()

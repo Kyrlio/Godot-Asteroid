@@ -1,25 +1,19 @@
-[gd_scene load_steps=11 format=3 uid="uid://we7xx2omqegd"]
+[gd_scene format=3 uid="uid://we7xx2omqegd"]
 
-[ext_resource type="Texture2D" uid="uid://bwh2ta0ci1n2i" path="res://assets/particles/particles.png" id="1_hcqs8"]
-
-[sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_swl84"]
-particles_animation = true
-particles_anim_h_frames = 4
-particles_anim_v_frames = 1
-particles_anim_loop = false
+[ext_resource type="Script" uid="uid://bv8eofvsvew2n" path="res://src/systems/scripts/self_freeing_particles.gd" id="1_tdeuh"]
 
 [sub_resource type="Gradient" id="Gradient_v75u6"]
 interpolation_mode = 1
-offsets = PackedFloat32Array(0, 0.333333, 0.666667)
-colors = PackedColorArray(0.952941, 0.768627, 0.109804, 1, 0.976471, 0.52549, 0.0901961, 1, 1, 1, 1, 1)
+offsets = PackedFloat32Array(0, 0.5)
+colors = PackedColorArray(0.9019608, 0.7254902, 0.3529412, 1, 0.8352941, 0.84705883, 0.81960785, 1)
 metadata/_snap_enabled = true
-metadata/_snap_count = 3
+metadata/_snap_count = 2
 
 [sub_resource type="GradientTexture1D" id="GradientTexture1D_q5w35"]
 gradient = SubResource("Gradient_v75u6")
 
 [sub_resource type="Curve" id="Curve_r10hh"]
-_data = [Vector2(0, 0), 0.0, -0.0178677, 0, 0, Vector2(0.0878187, 1), 0.0, 0.0, 0, 0, Vector2(0.512748, 1), 0.0, 0.0, 0, 0, Vector2(1, 0), -0.6458, 0.0, 0, 0]
+_data = [Vector2(0, 0), 0.0, -0.0178677, 0, 0, Vector2(0.012578614, 1), 0.0, 0.0, 0, 0, Vector2(0.512748, 1), 0.0, 0.0, 0, 0, Vector2(1, 0), -0.6458, 0.0, 0, 0]
 point_count = 4
 
 [sub_resource type="CurveTexture" id="CurveTexture_vfxps"]
@@ -29,7 +23,6 @@ curve = SubResource("Curve_r10hh")
 particle_flag_disable_z = true
 angle_min = -720.0
 angle_max = 720.0
-spread = 10.0
 initial_velocity_min = 150.0
 initial_velocity_max = 300.0
 angular_velocity_min = -720.0
@@ -37,77 +30,18 @@ angular_velocity_max = 720.0
 gravity = Vector3(0, 0, 0)
 damping_min = 900.0
 damping_max = 900.0
-scale_min = 0.29999998
-scale_max = 0.7
+scale_max = 1.5
 scale_curve = SubResource("CurveTexture_vfxps")
 color_initial_ramp = SubResource("GradientTexture1D_q5w35")
 anim_offset_max = 1.0
 
-[sub_resource type="Animation" id="Animation_swl84"]
-length = 0.001
-tracks/0/type = "value"
-tracks/0/imported = false
-tracks/0/enabled = true
-tracks/0/path = NodePath(".:emitting")
-tracks/0/interp = 1
-tracks/0/loop_wrap = true
-tracks/0/keys = {
-"times": PackedFloat32Array(0),
-"transitions": PackedFloat32Array(1),
-"update": 1,
-"values": [false]
-}
-
-[sub_resource type="Animation" id="Animation_hcqs8"]
-resource_name = "default"
-step = 0.05
-tracks/0/type = "value"
-tracks/0/imported = false
-tracks/0/enabled = true
-tracks/0/path = NodePath(".:emitting")
-tracks/0/interp = 1
-tracks/0/loop_wrap = true
-tracks/0/keys = {
-"times": PackedFloat32Array(0),
-"transitions": PackedFloat32Array(1),
-"update": 1,
-"values": [true]
-}
-tracks/1/type = "method"
-tracks/1/imported = false
-tracks/1/enabled = true
-tracks/1/path = NodePath(".")
-tracks/1/interp = 1
-tracks/1/loop_wrap = true
-tracks/1/keys = {
-"times": PackedFloat32Array(1),
-"transitions": PackedFloat32Array(1),
-"values": [{
-"args": [],
-"method": &"queue_free"
-}]
-}
-
-[sub_resource type="AnimationLibrary" id="AnimationLibrary_v75u6"]
-_data = {
-&"RESET": SubResource("Animation_swl84"),
-&"default": SubResource("Animation_hcqs8")
-}
-
-[node name="MuzzleFlash" type="GPUParticles2D"]
-material = SubResource("CanvasItemMaterial_swl84")
+[node name="MuzzleFlash" type="GPUParticles2D" unique_id=1800345715]
 emitting = false
 amount = 5
-texture = ExtResource("1_hcqs8")
-lifetime = 0.2
+lifetime = 0.15000000000000002
 one_shot = true
 explosiveness = 0.9
 fixed_fps = 0
 interpolate = false
 process_material = SubResource("ParticleProcessMaterial_0lyqo")
-
-[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
-libraries = {
-&"": SubResource("AnimationLibrary_v75u6")
-}
-autoplay = "default"
+script = ExtResource("1_tdeuh")

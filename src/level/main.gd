@@ -2,6 +2,7 @@ class_name Main
 extends Node2D
 
 @export var rock_scene: PackedScene
+@export var enemy_scene: PackedScene
 
 @onready var rock_spawn: PathFollow2D = $RockPath/RockSpawn
 @onready var camera: CustomCamera = $Camera2D
@@ -52,7 +53,7 @@ func spawn_rock(size: float, pos = null, vel = null) -> void:
 		rock_spawn.progress = randi()
 		pos = rock_spawn.position
 	if vel == null:
-		vel = Vector2.RIGHT.rotated(randf_range(0, TAU)) * randf_range(10, 25)
+		vel = Vector2.RIGHT.rotated(randf_range(0, TAU)) * randf_range(15, 35)
 	
 	var rock: Rock = rock_scene.instantiate()
 	rock.screen_size = screen_size
@@ -82,6 +83,7 @@ func new_level() -> void:
 	level += 1
 	hud.show_message("Wave %s" % level)
 	player.reset()
+	$EnemyTimer.start(randf_range(5, 10))
 	for i in level:
 		spawn_rock(3)
 
@@ -96,6 +98,9 @@ func freeze_engine(freeze_slow: float = 0.06, freeze_time: float = 0.2) -> void:
 
 
 func _on_rock_exploded(size: float, radius: float, pos: Vector2, vel: Vector2) -> void:
+	score += 10 * size
+	hud.update_score(score)
+	
 	if size <= 1.0:
 		return
 	
@@ -104,3 +109,10 @@ func _on_rock_exploded(size: float, radius: float, pos: Vector2, vel: Vector2) -
 		var newpos: Vector2 = pos + dir * radius
 		var newvel: Vector2 = dir * vel.length() * 1.1
 		spawn_rock(size - 1, newpos, newvel)
+
+
+func _on_enemy_timer_timeout() -> void:
+	var enemy: Enemy = enemy_scene.instantiate()
+	add_child(enemy)
+	enemy.target = player
+	$EnemyTimer.start(randf_range(20, 40))

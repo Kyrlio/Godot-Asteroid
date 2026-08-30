@@ -1,9 +1,10 @@
 [gd_scene format=3 uid="uid://g60avxd8r2vt"]
 
-[ext_resource type="Texture2D" uid="uid://clkpeg3ojc5o6" path="res://assets/player2.png" id="1_4m8ck"]
 [ext_resource type="Script" uid="uid://s2ba3ygh1frk" path="res://src/entities/player/player.gd" id="1_vt6n5"]
 [ext_resource type="PackedScene" uid="uid://cwrbwwi7mmqpy" path="res://src/entities/bullet/bullet.tscn" id="2_muk8e"]
+[ext_resource type="PackedScene" uid="uid://we7xx2omqegd" path="res://src/systems/particles/muzzle_flash/muzzle_flash.tscn" id="3_ketdh"]
 [ext_resource type="PackedScene" uid="uid://c2nyj1krwgq5a" path="res://src/systems/particles/explosion_particles/explosion_particles.tscn" id="3_wrxq6"]
+[ext_resource type="Texture2D" uid="uid://cqqxstronx6fq" path="res://assets/ship.png" id="4_wrxq6"]
 
 [sub_resource type="Animation" id="Animation_muk8e"]
 length = 0.001
@@ -43,19 +44,27 @@ _data = {
 &"shoot": SubResource("Animation_wrxq6")
 }
 
-[sub_resource type="Gradient" id="Gradient_vt6n5"]
-offsets = PackedFloat32Array(0, 0.55136985)
-colors = PackedColorArray(0.9019608, 0.7254902, 0.3529412, 1, 0.9019608, 0.7254902, 0.3529412, 1)
-
-[sub_resource type="GradientTexture1D" id="GradientTexture1D_vt6n5"]
-gradient = SubResource("Gradient_vt6n5")
-
 [sub_resource type="Curve" id="Curve_muk8e"]
 _data = [Vector2(0, 0), 0.0, 0.0, 0, 0, Vector2(0.034591198, 1), 0.0, 0.0, 0, 0, Vector2(0.49685535, 1), 0.0, 0.0, 0, 0, Vector2(1, 0), 0.0, 0.0, 0, 0]
 point_count = 4
 
 [sub_resource type="CurveTexture" id="CurveTexture_x416w"]
 curve = SubResource("Curve_muk8e")
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_ketdh"]
+particle_flag_disable_z = true
+emission_shape = 3
+emission_box_extents = Vector3(1, 1.655, 1)
+angle_min = -720.0
+angle_max = 720.0
+direction = Vector3(-1, 0, 0)
+spread = 25.0
+initial_velocity_min = 4.0
+initial_velocity_max = 8.0
+gravity = Vector3(0, 0, 0)
+scale_max = 3.0
+scale_curve = SubResource("CurveTexture_x416w")
+color = Color(0.9019608, 0.7254902, 0.3529412, 1)
 
 [sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_wrxq6"]
 particle_flag_disable_z = true
@@ -70,7 +79,7 @@ initial_velocity_max = 8.0
 gravity = Vector3(0, 0, 0)
 scale_max = 3.0
 scale_curve = SubResource("CurveTexture_x416w")
-color_ramp = SubResource("GradientTexture1D_vt6n5")
+color = Color(0.9019608, 0.7254902, 0.3529412, 1)
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_ketdh"]
 radius = 3.0
@@ -80,6 +89,7 @@ contact_monitor = true
 max_contacts_reported = 1
 script = ExtResource("1_vt6n5")
 explosion_particles_scene = ExtResource("3_wrxq6")
+muzzle_flash_particles_scene = ExtResource("3_ketdh")
 bullet_scene = ExtResource("2_muk8e")
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=1628489405]
@@ -91,7 +101,7 @@ amount = 24
 lifetime = 0.6
 fixed_fps = 0
 interpolate = false
-process_material = SubResource("ParticleProcessMaterial_wrxq6")
+process_material = SubResource("ParticleProcessMaterial_ketdh")
 
 [node name="GPUParticles2D2" type="GPUParticles2D" parent="." unique_id=1000340756]
 position = Vector2(-3, 0)
@@ -105,7 +115,7 @@ rotation = -1.5707964
 shape = SubResource("CircleShape2D_ketdh")
 
 [node name="Sprite2D" type="Sprite2D" parent="." unique_id=1380703862]
-texture = ExtResource("1_4m8ck")
+texture = ExtResource("4_wrxq6")
 
 [node name="Muzzle" type="Marker2D" parent="." unique_id=1831816395]
 position = Vector2(5, 0)

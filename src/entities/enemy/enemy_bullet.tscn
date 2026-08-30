@@ -1,8 +1,7 @@
-[gd_scene format=3 uid="uid://cwrbwwi7mmqpy"]
+[gd_scene format=3 uid="uid://7k0y01e0it87"]
 
-[ext_resource type="Script" uid="uid://cl7gvoawrklfx" path="res://src/entities/bullet/bullet.gd" id="1_smoiw"]
-[ext_resource type="PackedScene" uid="uid://dtm267ungrnsi" path="res://src/systems/particles/environment_impact_particles/environment_impact_particles.tscn" id="2_2ys4o"]
-[ext_resource type="Script" uid="uid://cp3umhucxfl11" path="res://addons/trail_2d/trail_2d.gd" id="2_d285a"]
+[ext_resource type="Script" uid="uid://dkt2k3le20ywb" path="res://src/entities/enemy/enemy_bullet.gd" id="1_bd8dr"]
+[ext_resource type="Script" uid="uid://cp3umhucxfl11" path="res://addons/trail_2d/trail_2d.gd" id="2_4c5fw"]
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_0thxj"]
 radius = 1.9999999
@@ -15,9 +14,8 @@ load_path = "res://.godot/imported/laser.png-af9ca9427a51d96a36a733a4aa4be8b2.ct
 _data = [Vector2(0, 1), 0.0, 0.0, 0, 0, Vector2(1, 0), 0.0, 0.0, 0, 0]
 point_count = 2
 
-[node name="Bullet" type="Area2D" unique_id=1522123817]
-script = ExtResource("1_smoiw")
-hit_particles_scene = ExtResource("2_2ys4o")
+[node name="EnemyBullet" type="Area2D" unique_id=1522123817]
+script = ExtResource("1_bd8dr")
 
 [node name="VisibleOnScreenEnabler2D" type="VisibleOnScreenEnabler2D" parent="." unique_id=1670931263]
 
@@ -32,10 +30,9 @@ texture = SubResource("CompressedTexture2D_k4vey")
 width = 2.0
 width_curve = SubResource("Curve_d285a")
 default_color = Color(0.9019608, 0.7254902, 0.3529412, 1)
-script = ExtResource("2_d285a")
+script = ExtResource("2_4c5fw")
 length = 4
 metadata/_custom_type_script = "uid://cp3umhucxfl11"
 
-[connection signal="area_entered" from="." to="." method="_on_area_entered"]
 [connection signal="body_entered" from="." to="." method="_on_body_entered"]
 [connection signal="screen_exited" from="VisibleOnScreenEnabler2D" to="." method="_on_visible_on_screen_enabler_2d_screen_exited"]

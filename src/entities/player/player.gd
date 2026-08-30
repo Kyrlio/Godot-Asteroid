@@ -3,6 +3,7 @@ extends RigidBody2D
 
 signal lives_changed(lives: int)
 signal dead
+signal shield_changed
 
 enum State {INIT, ALIVE, INVULNERABLE, DEAD}
 
@@ -12,8 +13,11 @@ enum State {INIT, ALIVE, INVULNERABLE, DEAD}
 
 @export_group("Combat")
 @export var explosion_particles_scene: PackedScene
+@export var muzzle_flash_particles_scene: PackedScene
 @export var bullet_scene: PackedScene
 @export var fire_rate = 0.25
+@export var max_shield: float = 100.0
+@export var shield_regen: float = 5.0
 
 @onready var collision_shape: CollisionShape2D = $CollisionShape2D
 @onready var gun_cooldown: Timer = $GunCooldown
@@ -130,9 +134,18 @@ func shoot() -> void:
 	gun_cooldown.start()
 	Globals.camera.shake(0.15, 30.0, 2.0)
 	animation_player.play("shoot")
+	#spawn_muzzle_flash()
 	var bullet: Bullet = bullet_scene.instantiate()
 	get_tree().root.add_child(bullet)
 	bullet.start(muzzle.global_transform)
+
+
+func spawn_muzzle_flash() -> void:
+	var instance: GPUParticles2D = muzzle_flash_particles_scene.instantiate()
+	instance.global_transform = muzzle.global_transform
+	get_tree().root.add_child(instance)
+	instance.restart()
+	instance.emitting = true
 
 
 func spawn_explosion_particles() -> void:
