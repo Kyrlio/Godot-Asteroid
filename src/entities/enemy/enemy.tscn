@@ -114,6 +114,7 @@ shader_parameter/flash_color = Color(0.8352941, 0.84705883, 0.81960785, 1)
 shader_parameter/flash_value = 0.0
 
 [node name="Enemy" type="Area2D" unique_id=294963804 groups=["enemies"]]
+process_mode = 1
 script = ExtResource("1_w1tau")
 explosion_particle_scene = ExtResource("2_yu70o")
 bullet_scene = ExtResource("3_y6j3k")

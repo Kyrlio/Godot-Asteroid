@@ -6,7 +6,7 @@ signal start_game
 @onready var message: Label = %Message
 @onready var start_button: Button = %StartButton
 @onready var score_label: Label = %ScoreLabel
-@onready var shield_bar: TextureProgressBar = %ShieldBar
+@onready var shield_bar_wrapper: ShieldBar = $MarginContainer/ShieldBarWrapper
 
 var old_score: int = 0
 var score_tween: Tween
@@ -44,13 +44,16 @@ func update_score(value: int) -> void:
 
 
 func update_shield(value: float) -> void:
-	shield_bar.value = value
+	shield_bar_wrapper.update_shield(value)
+	#shield_bar.update_shield(value)
+	#shield_bar.value = value
 
 
 func game_over() -> void:
 	show_message("Game Over")
 	await $Timer.timeout
 	start_button.show()
+	start_button.grab_focus()
 
 
 func _on_start_button_pressed() -> void:

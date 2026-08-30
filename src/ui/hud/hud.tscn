@@ -3,12 +3,17 @@
 [ext_resource type="Script" uid="uid://cgybqdh1bta48" path="res://src/ui/hud/hud.gd" id="1_cvkdw"]
 [ext_resource type="Script" uid="uid://cp2dbfvgqufvg" path="res://src/systems/scripts/start_button.gd" id="1_jobw0"]
 [ext_resource type="Texture2D" uid="uid://dib5kke88a3ho" path="res://assets/ui/health_bar.png" id="2_udh2q"]
+[ext_resource type="Script" uid="uid://c26q1m2lrqmy4" path="res://src/ui/hud/shield_bar.gd" id="3_076te"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_cvkdw"]
 atlas = ExtResource("2_udh2q")
 region = Rect2(0, 0, 32, 8)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_076te"]
+atlas = ExtResource("2_udh2q")
+region = Rect2(0, 15, 32, 8)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_udh2q"]
 atlas = ExtResource("2_udh2q")
 region = Rect2(0, 8, 32, 8)
 
@@ -30,6 +35,61 @@ theme_override_constants/margin_top = 4
 theme_override_constants/margin_right = 4
 theme_override_constants/margin_bottom = 4
 
+[node name="ShieldBarWrapper" type="Control" parent="MarginContainer" unique_id=1605995677]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 0
+script = ExtResource("3_076te")
+
+[node name="DamageBar" type="TextureProgressBar" parent="MarginContainer/ShieldBarWrapper" unique_id=489921491]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(50, 6)
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -25.0
+offset_right = 25.0
+offset_bottom = 6.0
+grow_horizontal = 2
+size_flags_horizontal = 4
+size_flags_vertical = 0
+offset_transform_enabled = true
+max_value = 1.0
+step = 0.01
+value = 0.65
+nine_patch_stretch = true
+stretch_margin_left = 2
+stretch_margin_top = 2
+stretch_margin_right = 2
+stretch_margin_bottom = 2
+texture_under = SubResource("AtlasTexture_cvkdw")
+texture_progress = SubResource("AtlasTexture_076te")
+
+[node name="ShieldBar" type="TextureProgressBar" parent="MarginContainer/ShieldBarWrapper" unique_id=1075686645]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(50, 6)
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -25.0
+offset_right = 25.0
+offset_bottom = 6.0
+grow_horizontal = 2
+size_flags_horizontal = 4
+size_flags_vertical = 0
+offset_transform_enabled = true
+max_value = 1.0
+step = 0.01
+value = 0.52
+nine_patch_stretch = true
+stretch_margin_left = 2
+stretch_margin_top = 2
+stretch_margin_right = 2
+stretch_margin_bottom = 2
+texture_progress = SubResource("AtlasTexture_udh2q")
+
 [node name="ScoreLabel" type="Label" parent="MarginContainer" unique_id=1034145177]
 unique_name_in_owner = true
 layout_mode = 2
@@ -38,24 +98,6 @@ size_flags_vertical = 0
 offset_transform_enabled = true
 theme_override_font_sizes/font_size = 6
 text = "9999"
-
-[node name="ShieldBar" type="TextureProgressBar" parent="MarginContainer" unique_id=489921491]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(50, 6)
-layout_mode = 2
-size_flags_horizontal = 4
-size_flags_vertical = 0
-offset_transform_enabled = true
-max_value = 1.0
-step = 0.01
-value = 0.71
-nine_patch_stretch = true
-stretch_margin_left = 2
-stretch_margin_top = 2
-stretch_margin_right = 2
-stretch_margin_bottom = 2
-texture_under = SubResource("AtlasTexture_cvkdw")
-texture_progress = SubResource("AtlasTexture_076te")
 
 [node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer" unique_id=642841269]
 layout_mode = 2
@@ -68,6 +110,8 @@ visible = false
 layout_mode = 2
 offset_transform_enabled = true
 theme_override_font_sizes/font_size = 12
+horizontal_alignment = 1
+vertical_alignment = 1
 
 [node name="StartButton" type="Button" parent="MarginContainer/VBoxContainer" unique_id=330637616]
 unique_name_in_owner = true

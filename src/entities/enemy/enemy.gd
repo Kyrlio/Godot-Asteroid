@@ -53,6 +53,7 @@ func shoot_pulse(n: int, delay: float) -> void:
 func take_damage(amount: int) -> void:
 	health -= amount
 	$AnimationPlayer.play("hit_flash")
+	$GunCooldown.start()
 	if health <= 0:
 		explode()
 

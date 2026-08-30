@@ -115,4 +115,4 @@ func _on_enemy_timer_timeout() -> void:
 	var enemy: Enemy = enemy_scene.instantiate()
 	add_child(enemy)
 	enemy.target = player
-	$EnemyTimer.start(randf_range(20, 40))
+	$EnemyTimer.start(randf_range(30, 50))

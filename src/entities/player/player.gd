@@ -51,10 +51,11 @@ var lives: int = 3:
 		else:
 			change_state(State.INVULNERABLE)
 
-var shield: float = 0:
+var shield: float = 100.0:
 	set(value):
-		value = min(value, max_shield)
-		shield = value
+		var clamped_val: float = clampf(value, 0.0, max_shield)
+		if is_equal_approx(shield, clamped_val): return
+		shield = clamped_val
 		shield_changed.emit(shield / max_shield)
 		if shield <= 0:
 			lives -= 1
