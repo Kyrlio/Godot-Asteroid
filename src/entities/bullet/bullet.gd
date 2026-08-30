@@ -32,7 +32,7 @@ func _on_body_entered(body: Node2D) -> void:
 	if body.is_in_group("rocks"):
 		body.explode()
 		spawn_hit_particles()
-		queue_free()
+		queue_free.call_deferred()
 
 
 func _on_area_entered(area: Area2D) -> void:

@@ -92,7 +92,7 @@ tracks/2/keys = {
 "times": PackedFloat32Array(0.1),
 "transitions": PackedFloat32Array(1),
 "values": [{
-"args": [4],
+"args": [2],
 "method": &"start_hitstop"
 }]
 }

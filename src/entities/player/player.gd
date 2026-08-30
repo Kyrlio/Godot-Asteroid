@@ -17,7 +17,7 @@ enum State {INIT, ALIVE, INVULNERABLE, DEAD}
 @export var bullet_scene: PackedScene
 @export var fire_rate = 0.25
 @export var max_shield: float = 100.0
-@export var shield_regen: float = 5.0
+@export var shield_regen: float = 2.5
 
 @onready var collision_shape: CollisionShape2D = $CollisionShape2D
 @onready var gun_cooldown: Timer = $GunCooldown
@@ -35,11 +35,13 @@ var screen_size: Vector2 = Vector2.ZERO
 var can_shoot: bool = true
 var reset_pos: bool = false
 var orbit_angle: float = 0.0
+
 var lives: int = 3:
 	set(value):
 		lives = value
 		lives_changed.emit(lives)
 		queue_redraw()
+		shield = max_shield
 		if lives <= 0:
 			gpu_particles.emitting = false
 			gpu_particles_2.emitting = false
@@ -49,6 +51,14 @@ var lives: int = 3:
 		else:
 			change_state(State.INVULNERABLE)
 
+var shield: float = 0:
+	set(value):
+		value = min(value, max_shield)
+		shield = value
+		shield_changed.emit(shield / max_shield)
+		if shield <= 0:
+			lives -= 1
+
 func _ready() -> void:
 	change_state(State.ALIVE)
 	screen_size = get_viewport_rect().size
@@ -57,6 +67,10 @@ func _ready() -> void:
 
 func _process(delta: float) -> void:
 	get_input()
+	
+	shield += shield_regen * delta
+	
+	# Lives circles
 	orbit_angle += 3.0 * delta
 	queue_redraw()
 
@@ -185,5 +199,5 @@ func _on_invulnerability_timer_timeout() -> void:
 func _on_body_entered(body: Node) -> void:
 	if body.is_in_group("rocks"):
 		if state == State.ALIVE:
+			shield -= body.size * 25
 			body.explode()
-			lives -= 1

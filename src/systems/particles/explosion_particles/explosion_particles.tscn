@@ -2,12 +2,15 @@
 
 [ext_resource type="Script" uid="uid://bv8eofvsvew2n" path="res://src/systems/scripts/self_freeing_particles.gd" id="2_1gx72"]
 
-[sub_resource type="Gradient" id="Gradient_olsgg"]
-offsets = PackedFloat32Array(0, 0.36666667, 0.5962963, 1)
-colors = PackedColorArray(0.9019608, 0.7254902, 0.3529412, 1, 0.6392157, 0.34117648, 0.30588236, 1, 0.13725491, 0.22352941, 0.2, 1, 0.13725491, 0.22352941, 0.2, 0)
+[sub_resource type="Gradient" id="Gradient_0utfl"]
+interpolation_mode = 1
+offsets = PackedFloat32Array(0, 0.5)
+colors = PackedColorArray(0.9019608, 0.7254902, 0.3529412, 1, 0.6392157, 0.34117648, 0.30588236, 1)
+metadata/_snap_enabled = true
+metadata/_snap_count = 2
 
-[sub_resource type="GradientTexture1D" id="GradientTexture1D_r3lwr"]
-gradient = SubResource("Gradient_olsgg")
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_y6j3k"]
+gradient = SubResource("Gradient_0utfl")
 
 [sub_resource type="Curve" id="Curve_nlplr"]
 _data = [Vector2(0, 0), 0.0, 0.0, 0, 0, Vector2(0.018867925, 1), 0.0, 0.0, 0, 0, Vector2(1, 0), 0.0, 0.0, 0, 0]
@@ -26,12 +29,16 @@ gravity = Vector3(0, 0, 0)
 scale_min = 2.0
 scale_max = 5.0
 scale_curve = SubResource("CurveTexture_djm3w")
-color_ramp = SubResource("GradientTexture1D_r3lwr")
+color_ramp = SubResource("GradientTexture1D_y6j3k")
 anim_speed_min = 1.0
 anim_speed_max = 2.0
 
 [sub_resource type="Gradient" id="Gradient_x0bnn"]
+interpolation_mode = 1
+offsets = PackedFloat32Array(0, 0.5)
 colors = PackedColorArray(0.9019608, 0.7254902, 0.3529412, 1, 0.6392157, 0.34117648, 0.30588236, 1)
+metadata/_snap_enabled = true
+metadata/_snap_count = 2
 
 [sub_resource type="GradientTexture1D" id="GradientTexture1D_0utfl"]
 gradient = SubResource("Gradient_x0bnn")

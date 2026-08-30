@@ -3,9 +3,10 @@ extends CanvasLayer
 
 signal start_game
 
-@onready var message: Label = $MarginContainer/VBoxContainer/Message
-@onready var start_button: Button = $MarginContainer/VBoxContainer/StartButton
-@onready var score_label: Label = $MarginContainer/HBoxContainer/ScoreLabel
+@onready var message: Label = %Message
+@onready var start_button: Button = %StartButton
+@onready var score_label: Label = %ScoreLabel
+@onready var shield_bar: TextureProgressBar = %ShieldBar
 
 var old_score: int = 0
 var score_tween: Tween
@@ -40,6 +41,10 @@ func update_score(value: int) -> void:
 	score_tween.chain().tween_property(score_label, "offset_transform_scale", Vector2.ONE, 0.6).set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_ELASTIC)
 	
 	old_score = value
+
+
+func update_shield(value: float) -> void:
+	shield_bar.value = value
 
 
 func game_over() -> void:
