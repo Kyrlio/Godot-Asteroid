@@ -82,7 +82,7 @@ scale_curve = SubResource("CurveTexture_x416w")
 color = Color(0.9019608, 0.7254902, 0.3529412, 1)
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_ketdh"]
-radius = 3.0
+radius = 5.0
 
 [node name="Player" type="RigidBody2D" unique_id=1248783488]
 contact_monitor = true

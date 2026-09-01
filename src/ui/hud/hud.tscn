@@ -39,6 +39,7 @@ theme_override_constants/margin_bottom = 4
 layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 0
+offset_transform_enabled = true
 script = ExtResource("3_076te")
 
 [node name="DamageBar" type="TextureProgressBar" parent="MarginContainer/ShieldBarWrapper" unique_id=489921491]

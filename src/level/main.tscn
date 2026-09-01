@@ -69,7 +69,7 @@ script = ExtResource("4_ycmpe")
 [node name="Player" parent="." unique_id=1248783488 instance=ExtResource("3_rmewx")]
 visible = false
 position = Vector2(80, 72)
-spin_power = 200
+spin_power = 650
 
 [node name="RockPath" type="Path2D" parent="." unique_id=1817407202]
 curve = SubResource("Curve2D_6c8sm")

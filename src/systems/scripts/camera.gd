@@ -22,6 +22,8 @@ var objects = null
 @onready var normal_position = position
 @onready var normal_smoothing_speed = position_smoothing_speed
 
+var _camera_tween: Tween
+
 func _ready():
 	set_process(true)
 
@@ -45,17 +47,13 @@ func _process(delta):
 				average_pos += x.global_position
 			average_pos /= objects.size()
 			
-#			var dist_from_center = center.distance_to(average_pos)
 			var dist_from_center = (average_pos - center) / center
 			drag_horizontal_offset = dist_from_center.x * dynamic_factor
 			drag_vertical_offset = dist_from_center.y * dynamic_factor
 			
 			# Zoom in or out camera depending on players position
-			var max_distance: float = 0.0
 			var distance = average_pos.distance_to(Vector2(center.x, get_viewport_rect().size.y))
 			
-#			print("Distance: ", distance)
-#			print("Max dist: ", max_dist)
 			zoom = lerp(Vector2(0.975, 0.975), Vector2(1.025, 1.025), 1 - (distance/max_dist))
 	else:
 		pass
@@ -88,30 +86,62 @@ func _process(delta):
 		set_offset(get_offset() - _last_offset)
 		
 func follow_target(delta: float) -> void:
-	global_position = lerp(global_position, target.global_position, 12.0 * delta)
+	if not is_instance_valid(target):
+		target = null
+		return
+	if global_position.distance_to(target.global_position) > 80.0:
+		global_position = target.global_position
+	else:
+		global_position = lerp(global_position, target.global_position, 15.0 * delta)
 
 func reset_camera() -> void:
+	target = null
+	if _camera_tween and _camera_tween.is_valid():
+		_camera_tween.kill()
 	global_position = normal_position
 	zoom = normal_zoom
+	set_offset(Vector2.ZERO)
+	_last_offset = Vector2.ZERO
+	_timer = 0.0
 
-func start_tracking(new_target) -> void:
-	position_smoothing_enabled = false
-	target = new_target
-	$Tween.remove_all()
-	$Tween.interpolate_property(self, "zoom", zoom, Vector2(0.8, 0.8), 0.8, 
-		Tween.TRANS_CUBIC, Tween.EASE_IN_OUT)
-	$Tween.start()
-	$Timer.start(1.5)
+func zoom_to(new_target, target_zoom: Vector2 = Vector2(2.2, 2.2), duration: float = 0.25) -> Tween:
+	if _camera_tween and _camera_tween.is_valid():
+		_camera_tween.kill()
 	
-func stop_tracking() -> void:
+	if new_target is Node2D:
+		target = new_target
+		_camera_tween = create_tween().set_ignore_time_scale(true).set_parallel(true)
+		_camera_tween.set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_CUBIC)
+		_camera_tween.tween_property(self, "zoom", target_zoom, duration)
+	elif new_target is Vector2:
+		target = null
+		_camera_tween = create_tween().set_ignore_time_scale(true).set_parallel(true)
+		_camera_tween.set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_CUBIC)
+		_camera_tween.tween_property(self, "global_position", new_target, duration)
+		_camera_tween.tween_property(self, "zoom", target_zoom, duration)
+	return _camera_tween
+
+func restore_zoom(duration: float = 0.35) -> Tween:
 	target = null
-	position_smoothing_enabled = true
-	$Tween.remove_all()
-	$Tween.interpolate_property(self, "zoom", zoom, normal_zoom, 1.0, 
-		Tween.TRANS_CUBIC, Tween.EASE_IN_OUT)
-	$Tween.interpolate_property(self, "position", position, normal_position, 0.8, 
-		Tween.TRANS_CUBIC, Tween.EASE_IN_OUT)
-	$Tween.start()
+	if _camera_tween and _camera_tween.is_valid():
+		_camera_tween.kill()
+	_camera_tween = create_tween().set_ignore_time_scale(true).set_parallel(true)
+	_camera_tween.set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_CUBIC)
+	_camera_tween.tween_property(self, "global_position", normal_position, duration)
+	_camera_tween.tween_property(self, "zoom", normal_zoom, duration)
+	return _camera_tween
+
+func start_tracking(new_target, tracking_zoom: Vector2 = Vector2(0.8, 0.8), duration: float = 0.8) -> void:
+	target = new_target
+	if _camera_tween and _camera_tween.is_valid():
+		_camera_tween.kill()
+	_camera_tween = create_tween().set_ignore_time_scale(true).set_parallel(true)
+	_camera_tween.set_ease(Tween.EASE_IN_OUT).set_trans(Tween.TRANS_CUBIC)
+	_camera_tween.tween_property(self, "zoom", tracking_zoom, duration)
+	
+func stop_tracking(duration: float = 1.0) -> void:
+	target = null
+	restore_zoom(duration)
 
 # Kick off a new screenshake effect.
 func shake(duration, frequency, amplitude):
@@ -129,8 +159,4 @@ func shake(duration, frequency, amplitude):
 	_last_offset = Vector2(0, 0)
 
 func _on_Timer_timeout() -> void:
-	if target == null or not is_instance_valid(target): return
-	$Tween.remove_all()
-	$Tween.interpolate_property(self, "zoom", zoom, Vector2(1, 1), 1.5, 
-		Tween.TRANS_CUBIC, Tween.EASE_IN_OUT)
-	$Tween.start()
+	pass

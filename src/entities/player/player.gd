@@ -41,24 +41,17 @@ var lives: int = 3:
 		lives = value
 		lives_changed.emit(lives)
 		queue_redraw()
-		shield = max_shield
-		if lives <= 0:
-			gpu_particles.emitting = false
-			gpu_particles_2.emitting = false
-			Globals.freeze_requested.emit(0.3, 2.5)
-			spawn_explosion_particles()
-			change_state(State.DEAD)
-		else:
-			change_state(State.INVULNERABLE)
 
 var shield: float = 100.0:
 	set(value):
+		if value < shield and state != State.ALIVE:
+			return
 		var clamped_val: float = clampf(value, 0.0, max_shield)
 		if is_equal_approx(shield, clamped_val): return
 		shield = clamped_val
 		shield_changed.emit(shield / max_shield)
 		if shield <= 0:
-			lives -= 1
+			_handle_shield_depleted()
 
 func _ready() -> void:
 	change_state(State.ALIVE)
@@ -123,6 +116,21 @@ func change_state(new_state: State) -> void:
 	state = new_state
 
 
+func _handle_shield_depleted() -> void:
+	if lives > 1:
+		change_state(State.INVULNERABLE)
+		shield = max_shield
+		lose_life()
+	else:
+		lives = 0
+		lives_changed.emit(0)
+		gpu_particles.emitting = false
+		gpu_particles_2.emitting = false
+		Globals.freeze_requested.emit(0.3, 2.5)
+		spawn_explosion_particles()
+		change_state(State.DEAD)
+
+
 func get_input() -> void:
 	thrust = Vector2.ZERO
 	if state in [State.DEAD, State.INIT]:
@@ -140,6 +148,69 @@ func get_input() -> void:
 	
 	if Input.is_action_pressed("shoot") and can_shoot:
 		shoot()
+
+
+func lose_life() -> void:
+	if lives <= 0: return
+	
+	# 1. Zoom de la caméra sur le joueur (avec suivi dynamique de self)
+	if Globals.camera and is_instance_valid(Globals.camera):
+		var zoom_tween: Tween = Globals.camera.zoom_to(self, Vector2(1.8, 1.8), 0.25)
+		await zoom_tween.finished
+	
+	# 2. Calcul de la position du cercle de vie qui va se détacher
+	var target_index: int = lives - 1
+	var radius = 8.0
+	
+	var angle: float = orbit_angle - rotation + (target_index * (TAU / max(lives, 1)))
+	var local_pos: Vector2 = Vector2.RIGHT.rotated(angle) * radius
+	var global_pos: Vector2 = to_global(local_pos)
+	
+	# Décrémenter la vie pour mettre à jour l'affichage orbital
+	lives -= 1
+	lives_changed.emit(lives)
+	queue_redraw()
+	
+	# Instancier le cercle temporaire dans la scène à sa position globale (reste sur place)
+	var temp_circle = Node2D.new()
+	temp_circle.set_script(preload("uid://d14kq07auhng1"))
+	temp_circle.global_position = global_pos
+	
+	get_tree().current_scene.add_child(temp_circle)
+	
+	# 3. Lancer l'animation de perte de vie en slow motion
+	await animate_life_loss_slowmo(temp_circle)
+	
+	# 4. Retour du zoom caméra à la normale
+	if Globals.camera and is_instance_valid(Globals.camera):
+		var restore_tween: Tween = Globals.camera.restore_zoom(0.35)
+		await restore_tween.finished
+
+
+func animate_life_loss_slowmo(circle_node: Node2D) -> void:
+	if not is_instance_valid(circle_node):
+		return
+	
+	Engine.time_scale = 0.5
+	var tween = create_tween().set_ignore_time_scale(true)
+	
+	# Grossir le cercle temporaire et le saturer vers le blanc
+	tween.set_parallel(true).set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_CUBIC)
+	tween.tween_property(circle_node, "scale", Vector2(3.0, 3.0), 0.3).set_delay(0.3)
+	#tween.tween_property(circle_node, "modulate", Color(15.934, 16.145, 15.652, 1.0), 0.5)
+	
+	# Rétrécir jusqu'à disparaître
+	tween.set_parallel(false)
+	tween.tween_property(circle_node, "scale", Vector2.ZERO, 0.2).set_delay(0.2)
+	
+	# Attendre la fin de l'effet
+	await tween.finished
+	await get_tree().create_timer(0.3).timeout
+	
+	# Rétablir le temps et détruire le nœud d'effet
+	Engine.time_scale = 1.0
+	if is_instance_valid(circle_node):
+		circle_node.queue_free()
 
 
 func shoot() -> void:
@@ -174,7 +245,14 @@ func spawn_explosion_particles() -> void:
 func reset() -> void:
 	reset_pos = true
 	$Sprite2D.show()
+	for child in get_children():
+		if child is LiveCircle:
+			child.queue_free()
 	lives = 3
+	shield = max_shield
+	Engine.time_scale = 1.0
+	if Globals.camera and is_instance_valid(Globals.camera):
+		Globals.camera.reset_camera()
 	change_state(State.ALIVE)
 
 

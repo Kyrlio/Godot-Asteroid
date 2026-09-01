@@ -72,9 +72,9 @@ func _trigger_damage_juice(target_ratio: float) -> void:
 	
 	if punch_tween and punch_tween.is_running():
 		punch_tween.kill()
-	scale = punch_scale
+	offset_transform_scale = punch_scale
 	punch_tween = create_tween().set_trans(Tween.TRANS_ELASTIC).set_ease(Tween.EASE_OUT)
-	punch_tween.tween_property(self, "scale", Vector2.ONE, 0.3)
+	punch_tween.tween_property(self, "offset_transform_scale", Vector2.ONE, 0.3)
 
 	if damage_catchup_tween and damage_catchup_tween.is_running():
 		damage_catchup_tween.kill()
