@@ -1,5 +1,9 @@
 extends Button
 
+const BUTTON_HOVER_SOUND = preload("uid://c4rke877k3iue")
+const BUTTON_CLICK_SOUND = preload("uid://bup8boipbquc8")
+
+
 var tween: Tween
 
 func _ready() -> void:
@@ -11,6 +15,7 @@ func _on_mouse_entered() -> void:
 	if tween and tween.is_running():
 		tween.kill()
 	
+	AudioManager.play_sfx(BUTTON_HOVER_SOUND, -5.0, randf_range(0.98, 1.05))
 	self.pivot_offset.x = size.x / 2.0
 	self.pivot_offset.y = size.y / 2.0
 	tween = create_tween().set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_ELASTIC).set_parallel(true)
@@ -22,6 +27,7 @@ func _on_pressed() -> void:
 	if tween and tween.is_running():
 		tween.kill()
 	
+	AudioManager.play_sfx(BUTTON_CLICK_SOUND, -5.0, randf_range(0.98, 1.05))
 	self.pivot_offset.x = size.x / 2.0
 	self.pivot_offset.y = size.y / 2.0
 	tween = create_tween().set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_ELASTIC).set_parallel(true)

@@ -196,8 +196,7 @@ hframes = 4
 [node name="GPUParticles2D" type="GPUParticles2D" parent="." unique_id=792669527]
 show_behind_parent = true
 position = Vector2(1, 0)
-amount = 24
-lifetime = 0.6
+amount = 16
 fixed_fps = 0
 interpolate = false
 process_material = SubResource("ParticleProcessMaterial_j4a4q")

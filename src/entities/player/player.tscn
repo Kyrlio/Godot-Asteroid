@@ -9,6 +9,7 @@
 [ext_resource type="AudioStream" uid="uid://dx8un04x32e0q" path="res://assets/sounds/engine.ogg" id="6_eb65w"]
 [ext_resource type="AudioStream" uid="uid://ckckxicfxlddy" path="res://assets/sounds/explosion.wav" id="7_4f0qm"]
 [ext_resource type="AudioStream" uid="uid://b3pnk6s4itnp4" path="res://assets/sounds/impact.sfxr" id="7_eb65w"]
+[ext_resource type="Shader" uid="uid://ea24rsf17x55" path="res://src/systems/shaders/hit_flash.gdshader" id="9_tk761"]
 
 [sub_resource type="AudioStreamRandomizer" id="AudioStreamRandomizer_0thxj"]
 random_pitch = 1.0594631
@@ -29,6 +30,35 @@ tracks/0/keys = {
 "update": 0,
 "values": [Vector2(1, 1)]
 }
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Sprite2D:material:shader_parameter/flash_value")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [0.0]
+}
+
+[sub_resource type="Animation" id="Animation_n7e5a"]
+resource_name = "hit_flash"
+length = 0.15
+step = 0.05
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite2D:material:shader_parameter/flash_value")
+tracks/0/interp = 0
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.15),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [1.0, 0.0]
+}
 
 [sub_resource type="Animation" id="Animation_wrxq6"]
 resource_name = "shoot"
@@ -46,10 +76,23 @@ tracks/0/keys = {
 "update": 0,
 "values": [Vector2(1, 1), Vector2(1.5, 0.835), Vector2(0.628, 1.165), Vector2(1, 1)]
 }
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Sprite2D:material:shader_parameter/flash_value")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [0.0]
+}
 
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_muk8e"]
 _data = {
 &"RESET": SubResource("Animation_muk8e"),
+&"hit_flash": SubResource("Animation_n7e5a"),
 &"shoot": SubResource("Animation_wrxq6")
 }
 
@@ -100,6 +143,11 @@ color = Color(0.9019608, 0.7254902, 0.3529412, 1)
 [sub_resource type="CircleShape2D" id="CircleShape2D_ketdh"]
 radius = 5.0
 
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_a8hv8"]
+shader = ExtResource("9_tk761")
+shader_parameter/flash_color = Color(0.8352941, 0.84705883, 0.81960785, 1)
+shader_parameter/flash_value = 0.0
+
 [node name="Player" type="RigidBody2D" unique_id=1248783488]
 contact_monitor = true
 max_contacts_reported = 1
@@ -149,6 +197,7 @@ rotation = -1.5707964
 shape = SubResource("CircleShape2D_ketdh")
 
 [node name="Sprite2D" type="Sprite2D" parent="." unique_id=1380703862]
+material = SubResource("ShaderMaterial_a8hv8")
 texture = ExtResource("4_wrxq6")
 
 [node name="Muzzle" type="Marker2D" parent="." unique_id=1831816395]

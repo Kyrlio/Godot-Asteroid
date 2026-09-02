@@ -212,6 +212,7 @@ func animate_life_loss_slowmo(circle_node: Node2D) -> void:
 	if not is_instance_valid(circle_node):
 		return
 	
+	$EngineSound.stop()
 	Globals.is_time_scale_locked = true
 	Globals.camera.target = circle_node
 	Engine.time_scale = 0.2
@@ -232,6 +233,8 @@ func animate_life_loss_slowmo(circle_node: Node2D) -> void:
 		explosion.amount *= 2
 		explosion.speed_scale = 1.0 / Engine.time_scale
 		get_tree().current_scene.add_child(explosion)
+		AudioManager.play_sfx(explosion_sound, -5.0)
+		AudioManager.play_sfx(impact_sound, -5.0)
 		circle_node.queue_free()
 		)
 	
@@ -272,6 +275,10 @@ func spawn_explosion_particles() -> void:
 	get_tree().root.add_child(instance)
 	instance.restart()
 	instance.emitting = true
+
+
+func play_hit_flash() -> void:
+	animation_player.play("hit_flash")
 
 
 func reset() -> void:
@@ -316,6 +323,7 @@ func _on_body_entered(body: Node) -> void:
 	if body.is_in_group("rocks"):
 		if state == State.ALIVE and not is_losing_life:
 			AudioManager.play_sfx(impact_sound, -5.0, randf_range(0.9, 1.1))
+			play_hit_flash()
 			var damage: float = body.size * 25
 			
 			if shield - damage <= 0:

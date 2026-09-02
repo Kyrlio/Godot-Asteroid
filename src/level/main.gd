@@ -124,8 +124,14 @@ func _on_rock_exploded(size: float, radius: float, pos: Vector2, vel: Vector2) -
 		spawn_rock(size - 1, newpos, newvel)
 
 
+func _on_enemy_died() -> void:
+	score += 50
+	hud.update_score(score)
+
+
 func _on_enemy_timer_timeout() -> void:
 	var enemy: Enemy = enemy_scene.instantiate()
 	add_child(enemy)
 	enemy.target = player
+	enemy.died.connect(_on_enemy_died)
 	$EnemyTimer.start(randf_range(30, 50))

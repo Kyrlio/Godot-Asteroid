@@ -1,6 +1,8 @@
 class_name Enemy
 extends Area2D
 
+signal died
+
 @export var explosion_particle_scene: PackedScene
 @export var bullet_scene: PackedScene
 @export var speed: int = 25
@@ -18,7 +20,7 @@ var target: Player = null
 var shoot_tween: Tween
 
 #Hitstop
-var hitstop_frames: int = 0
+var hitstop_frames: int = 0 
 var hitstop_hit: int = 4
 var hitstop_explode: int = 5
 
@@ -91,10 +93,11 @@ func stop_hitstop() -> void:
 
 
 func explode() -> void:
+	died.emit()
 	AudioManager.play_sfx(explosion_sound, -5.0, 1.0)
+	Globals.camera.shake(0.25, 40.0, 3.0)
 	speed = 0
 	$GunCooldown.stop()
-	Globals.camera.shake(0.25, 40.0, 3.0)
 	$CollisionShape2D.set_deferred("disabled", true)
 	$Sprite2D.hide()
 	spawn_explosion_particles()
