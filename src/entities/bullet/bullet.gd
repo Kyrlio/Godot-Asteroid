@@ -3,6 +3,7 @@ extends Area2D
 
 @export var speed: float = 180.0
 @export var hit_particles_scene: PackedScene
+@export var impact_sound: AudioStream
 
 var velocity: Vector2 = Vector2.ZERO
 
@@ -30,6 +31,7 @@ func _on_visible_on_screen_enabler_2d_screen_exited() -> void:
 
 func _on_body_entered(body: Node2D) -> void:
 	if body.is_in_group("rocks"):
+		AudioManager.play_sfx(impact_sound, -5.0, randf_range(0.9, 1.1))
 		body.explode()
 		spawn_hit_particles()
 		queue_free.call_deferred()
@@ -37,6 +39,7 @@ func _on_body_entered(body: Node2D) -> void:
 
 func _on_area_entered(area: Area2D) -> void:
 	if area.is_in_group("enemies"):
+		AudioManager.play_sfx(impact_sound, -5.0, randf_range(0.9, 1.1))
 		area.take_damage(1)
 		spawn_hit_particles()
 		queue_free.call_deferred()

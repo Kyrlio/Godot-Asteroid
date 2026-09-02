@@ -4,6 +4,7 @@ extends Area2D
 @export var speed: float = 120.0
 @export var damage: float = 15.0
 @export var hit_particles_scene: PackedScene
+@export var impact_sound: AudioStream
 
 
 func start(_pos, _dir) -> void:
@@ -31,6 +32,8 @@ func _on_body_entered(body: Node2D) -> void:
 	if body is Player:
 		if body.state == Player.State.ALIVE and not body.is_losing_life:
 			body.shield -= damage
+			AudioManager.play_sfx(impact_sound, -5.0, randf_range(0.9, 1.1))
+			Globals.camera.shake(0.2, 30, 2.0)
 			if body.state == Player.State.ALIVE and not body.is_losing_life and body.shield > 0:
 				Globals.freeze_requested.emit(0.1, 0.2)
 	spawn_hit_particles()

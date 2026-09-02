@@ -7,6 +7,9 @@ extends Area2D
 @export var health: int = 3
 @export var bullet_spread: float = 0.2
 @export var number_bullet: int = 1
+@export var pulse_delay: float = 0.15
+@export var laser_sound: AudioStream
+@export var explosion_sound: AudioStream
 
 @onready var sprite: Sprite2D = $Sprite2D
 
@@ -45,6 +48,8 @@ func shoot() -> void:
 	dir = dir.rotated(randf_range(-bullet_spread, bullet_spread))
 	var bullet: EnemyBullet = bullet_scene.instantiate()
 	get_tree().root.add_child(bullet)
+	#$LaserSound.play()
+	AudioManager.play_sfx(laser_sound, -15.0, randf_range(0.9, 1.1))
 	play_shoot_animation()
 	bullet.start(global_position, dir)
 
@@ -68,6 +73,7 @@ func shoot_pulse(n: int, delay: float) -> void:
 
 func take_damage(amount: int) -> void:
 	health -= amount
+	$ImpactSound.play()
 	$AnimationPlayer.play("hit_flash")
 	$GunCooldown.start()
 	if health <= 0:
@@ -85,6 +91,7 @@ func stop_hitstop() -> void:
 
 
 func explode() -> void:
+	AudioManager.play_sfx(explosion_sound, -5.0, 1.0)
 	speed = 0
 	$GunCooldown.stop()
 	Globals.camera.shake(0.25, 40.0, 3.0)
@@ -104,7 +111,7 @@ func spawn_explosion_particles() -> void:
 
 
 func _on_gun_cooldown_timeout() -> void:
-	shoot_pulse(number_bullet, 0.15)
+	shoot_pulse(number_bullet, pulse_delay)
 
 
 func _on_body_entered(body: Node2D) -> void:

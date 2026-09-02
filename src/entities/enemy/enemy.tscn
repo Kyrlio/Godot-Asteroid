@@ -6,6 +6,19 @@
 [ext_resource type="PackedScene" uid="uid://c2nyj1krwgq5a" path="res://src/systems/particles/explosion_particles/explosion_particles.tscn" id="2_yu70o"]
 [ext_resource type="PackedScene" uid="uid://7k0y01e0it87" path="res://src/entities/enemy/enemy_bullet.tscn" id="3_y6j3k"]
 [ext_resource type="PackedScene" uid="uid://baxdmnjvuev2y" path="res://src/entities/enemy paths/enemy_paths.tscn" id="3_yu70o"]
+[ext_resource type="AudioStream" uid="uid://ckckxicfxlddy" path="res://assets/sounds/explosion.wav" id="5_j4a4q"]
+[ext_resource type="AudioStream" uid="uid://b3pnk6s4itnp4" path="res://assets/sounds/impact.sfxr" id="6_0wpy6"]
+[ext_resource type="AudioStream" uid="uid://busvswxcmmqgv" path="res://assets/sounds/enemy_laser.wav" id="7_gdlib"]
+
+[sub_resource type="AudioStreamRandomizer" id="AudioStreamRandomizer_0thxj"]
+random_pitch = 1.0905077
+streams_count = 1
+stream_0/stream = ExtResource("7_gdlib")
+
+[sub_resource type="AudioStreamRandomizer" id="AudioStreamRandomizer_x416w"]
+random_pitch = 1.0594631
+streams_count = 1
+stream_0/stream = ExtResource("6_0wpy6")
 
 [sub_resource type="Animation" id="Animation_y6j3k"]
 length = 0.001
@@ -125,12 +138,47 @@ shader = ExtResource("1_i868r")
 shader_parameter/flash_color = Color(0.8352941, 0.84705883, 0.81960785, 1)
 shader_parameter/flash_value = 0.0
 
+[sub_resource type="Curve" id="Curve_0wpy6"]
+_data = [Vector2(0, 0), 0.0, 0.0, 0, 0, Vector2(0.034591198, 1), 0.0, 0.0, 0, 0, Vector2(0.49685535, 1), 0.0, 0.0, 0, 0, Vector2(1, 0), 0.0, 0.0, 0, 0]
+point_count = 4
+
+[sub_resource type="CurveTexture" id="CurveTexture_x416w"]
+curve = SubResource("Curve_0wpy6")
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_j4a4q"]
+particle_flag_disable_z = true
+emission_shape = 3
+emission_box_extents = Vector3(2.78, 2.605, 1)
+angle_min = -720.0
+angle_max = 720.0
+direction = Vector3(0, 0, 0)
+spread = 25.0
+gravity = Vector3(0, 0, 0)
+scale_max = 3.0
+scale_curve = SubResource("CurveTexture_x416w")
+color = Color(0.9019608, 0.7254902, 0.3529412, 1)
+
 [node name="Enemy" type="Area2D" unique_id=294963804 groups=["enemies"]]
 process_mode = 1
 script = ExtResource("1_w1tau")
 explosion_particle_scene = ExtResource("2_yu70o")
 bullet_scene = ExtResource("3_y6j3k")
-number_bullet = 5
+laser_sound = ExtResource("7_gdlib")
+explosion_sound = ExtResource("5_j4a4q")
+
+[node name="EnemyPaths" parent="." unique_id=510284959 instance=ExtResource("3_yu70o")]
+
+[node name="GunCooldown" type="Timer" parent="." unique_id=307173041]
+wait_time = 1.5
+autostart = true
+
+[node name="LaserSound" type="AudioStreamPlayer" parent="." unique_id=1886394491]
+stream = SubResource("AudioStreamRandomizer_0thxj")
+volume_db = -5.0
+max_polyphony = 3
+
+[node name="ImpactSound" type="AudioStreamPlayer" parent="." unique_id=1623269898]
+stream = SubResource("AudioStreamRandomizer_x416w")
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=1480673883]
 libraries/ = SubResource("AnimationLibrary_j4a4q")
@@ -145,11 +193,14 @@ material = SubResource("ShaderMaterial_0thxj")
 texture = ExtResource("2_w1tau")
 hframes = 4
 
-[node name="EnemyPaths" parent="." unique_id=510284959 instance=ExtResource("3_yu70o")]
-
-[node name="GunCooldown" type="Timer" parent="." unique_id=307173041]
-wait_time = 1.5
-autostart = true
+[node name="GPUParticles2D" type="GPUParticles2D" parent="." unique_id=792669527]
+show_behind_parent = true
+position = Vector2(1, 0)
+amount = 24
+lifetime = 0.6
+fixed_fps = 0
+interpolate = false
+process_material = SubResource("ParticleProcessMaterial_j4a4q")
 
 [connection signal="body_entered" from="." to="." method="_on_body_entered"]
 [connection signal="timeout" from="GunCooldown" to="." method="_on_gun_cooldown_timeout"]

@@ -5,6 +5,15 @@
 [ext_resource type="PackedScene" uid="uid://we7xx2omqegd" path="res://src/systems/particles/muzzle_flash/muzzle_flash.tscn" id="3_ketdh"]
 [ext_resource type="PackedScene" uid="uid://c2nyj1krwgq5a" path="res://src/systems/particles/explosion_particles/explosion_particles.tscn" id="3_wrxq6"]
 [ext_resource type="Texture2D" uid="uid://cqqxstronx6fq" path="res://assets/ship.png" id="4_wrxq6"]
+[ext_resource type="AudioStream" uid="uid://d3i3wcw31gi6s" path="res://assets/sounds/laser2.sfxr" id="5_oih67"]
+[ext_resource type="AudioStream" uid="uid://dx8un04x32e0q" path="res://assets/sounds/engine.ogg" id="6_eb65w"]
+[ext_resource type="AudioStream" uid="uid://ckckxicfxlddy" path="res://assets/sounds/explosion.wav" id="7_4f0qm"]
+[ext_resource type="AudioStream" uid="uid://b3pnk6s4itnp4" path="res://assets/sounds/impact.sfxr" id="7_eb65w"]
+
+[sub_resource type="AudioStreamRandomizer" id="AudioStreamRandomizer_0thxj"]
+random_pitch = 1.0594631
+streams_count = 1
+stream_0/stream = ExtResource("5_oih67")
 
 [sub_resource type="Animation" id="Animation_muk8e"]
 length = 0.001
@@ -48,7 +57,7 @@ _data = {
 _data = [Vector2(0, 0), 0.0, 0.0, 0, 0, Vector2(0.034591198, 1), 0.0, 0.0, 0, 0, Vector2(0.49685535, 1), 0.0, 0.0, 0, 0, Vector2(1, 0), 0.0, 0.0, 0, 0]
 point_count = 4
 
-[sub_resource type="CurveTexture" id="CurveTexture_x416w"]
+[sub_resource type="CurveTexture" id="CurveTexture_eb65w"]
 curve = SubResource("Curve_muk8e")
 
 [sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_ketdh"]
@@ -63,8 +72,15 @@ initial_velocity_min = 4.0
 initial_velocity_max = 8.0
 gravity = Vector3(0, 0, 0)
 scale_max = 3.0
-scale_curve = SubResource("CurveTexture_x416w")
+scale_curve = SubResource("CurveTexture_eb65w")
 color = Color(0.9019608, 0.7254902, 0.3529412, 1)
+
+[sub_resource type="Curve" id="Curve_0wpy6"]
+_data = [Vector2(0, 0), 0.0, 0.0, 0, 0, Vector2(0.034591198, 1), 0.0, 0.0, 0, 0, Vector2(0.49685535, 1), 0.0, 0.0, 0, 0, Vector2(1, 0), 0.0, 0.0, 0, 0]
+point_count = 4
+
+[sub_resource type="CurveTexture" id="CurveTexture_x416w"]
+curve = SubResource("Curve_0wpy6")
 
 [sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_wrxq6"]
 particle_flag_disable_z = true
@@ -91,6 +107,24 @@ script = ExtResource("1_vt6n5")
 explosion_particles_scene = ExtResource("3_wrxq6")
 muzzle_flash_particles_scene = ExtResource("3_ketdh")
 bullet_scene = ExtResource("2_muk8e")
+laser_sound = ExtResource("5_oih67")
+impact_sound = ExtResource("7_eb65w")
+explosion_sound = ExtResource("7_4f0qm")
+
+[node name="GunCooldown" type="Timer" parent="." unique_id=631506512]
+one_shot = true
+autostart = true
+
+[node name="InvulnerabilityTimer" type="Timer" parent="." unique_id=1381161391]
+wait_time = 2.0
+one_shot = true
+
+[node name="LaserSound" type="AudioStreamPlayer" parent="." unique_id=1914296108]
+stream = SubResource("AudioStreamRandomizer_0thxj")
+max_polyphony = 3
+
+[node name="EngineSound" type="AudioStreamPlayer" parent="." unique_id=1824944309]
+stream = ExtResource("6_eb65w")
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=1628489405]
 libraries/ = SubResource("AnimationLibrary_muk8e")
@@ -119,14 +153,6 @@ texture = ExtResource("4_wrxq6")
 
 [node name="Muzzle" type="Marker2D" parent="." unique_id=1831816395]
 position = Vector2(5, 0)
-
-[node name="GunCooldown" type="Timer" parent="." unique_id=631506512]
-one_shot = true
-autostart = true
-
-[node name="InvulnerabilityTimer" type="Timer" parent="." unique_id=1381161391]
-wait_time = 2.0
-one_shot = true
 
 [connection signal="body_entered" from="." to="." method="_on_body_entered"]
 [connection signal="timeout" from="GunCooldown" to="." method="_on_gun_cooldown_timeout"]

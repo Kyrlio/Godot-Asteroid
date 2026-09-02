@@ -3,6 +3,7 @@
 [ext_resource type="Script" uid="uid://cl7gvoawrklfx" path="res://src/entities/bullet/bullet.gd" id="1_smoiw"]
 [ext_resource type="PackedScene" uid="uid://dtm267ungrnsi" path="res://src/systems/particles/environment_impact_particles/environment_impact_particles.tscn" id="2_2ys4o"]
 [ext_resource type="Script" uid="uid://cp3umhucxfl11" path="res://addons/trail_2d/trail_2d.gd" id="2_d285a"]
+[ext_resource type="AudioStream" uid="uid://b3pnk6s4itnp4" path="res://assets/sounds/impact.sfxr" id="3_ig3qh"]
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_0thxj"]
 radius = 1.9999999
@@ -18,6 +19,7 @@ point_count = 2
 [node name="Bullet" type="Area2D" unique_id=1522123817]
 script = ExtResource("1_smoiw")
 hit_particles_scene = ExtResource("2_2ys4o")
+impact_sound = ExtResource("3_ig3qh")
 
 [node name="VisibleOnScreenEnabler2D" type="VisibleOnScreenEnabler2D" parent="." unique_id=1670931263]
 

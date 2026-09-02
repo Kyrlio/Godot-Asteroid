@@ -6,6 +6,9 @@
 [ext_resource type="PackedScene" uid="uid://g60avxd8r2vt" path="res://src/entities/player/player.tscn" id="3_rmewx"]
 [ext_resource type="PackedScene" uid="uid://sxbed12v2n6w" path="res://src/ui/hud/hud.tscn" id="3_rwyyx"]
 [ext_resource type="Script" uid="uid://2emugclv6msv" path="res://src/systems/scripts/camera.gd" id="4_ycmpe"]
+[ext_resource type="AudioStream" uid="uid://ckckxicfxlddy" path="res://assets/sounds/explosion.wav" id="7_a8hv8"]
+[ext_resource type="AudioStream" uid="uid://q7hmfuheyie6" path="res://assets/sounds/levelup.ogg" id="8_hu5rb"]
+[ext_resource type="AudioStream" uid="uid://1jfv7jitycu6" path="res://assets/sounds/Funky-Gameplay_Looping.ogg" id="9_nr8l7"]
 
 [sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_0thxj"]
 particle_flag_disable_z = true
@@ -75,6 +78,16 @@ spin_power = 650
 curve = SubResource("Curve2D_6c8sm")
 
 [node name="RockSpawn" type="PathFollow2D" parent="RockPath" unique_id=763317020]
+
+[node name="ExplosionSound" type="AudioStreamPlayer" parent="." unique_id=1420254630]
+stream = ExtResource("7_a8hv8")
+
+[node name="LevelUpSound" type="AudioStreamPlayer" parent="." unique_id=1292142338]
+stream = ExtResource("8_hu5rb")
+
+[node name="Music" type="AudioStreamPlayer" parent="." unique_id=33986888]
+stream = ExtResource("9_nr8l7")
+volume_db = -5.0
 
 [connection signal="start_game" from="HUD" to="." method="new_game"]
 [connection signal="timeout" from="EnemyTimer" to="." method="_on_enemy_timer_timeout"]

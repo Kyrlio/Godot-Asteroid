@@ -22,6 +22,11 @@ enum State {INIT, ALIVE, INVULNERABLE, DEAD}
 @export var max_shield: float = 100.0
 @export var shield_regen: float = 2.5
 
+@export_group("Sounds")
+@export var laser_sound: AudioStream
+@export var impact_sound: AudioStream
+@export var explosion_sound: AudioStream
+
 @onready var collision_shape: CollisionShape2D = $CollisionShape2D
 @onready var gun_cooldown: Timer = $GunCooldown
 @onready var muzzle: Marker2D = $Muzzle
@@ -93,7 +98,7 @@ func _draw() -> void:
 	if state == State.DEAD: return
 	
 	var color = Color(0.902, 0.725, 0.353, 1.0)
-	var radius: float = 8.0
+	var radius: float = 12.0
 	var size: Vector2 =  Vector2(2.5, 2.5)
 	
 	for i in range(lives):
@@ -109,13 +114,14 @@ func change_state(new_state: State) -> void:
 		State.ALIVE:
 			collision_shape.set_deferred("disabled", false)
 		State.INVULNERABLE:
-			#collision_shape.set_deferred("disabled", true)
 			if not is_losing_life:
 				_trigger_invincibility()
 				invulnerability_timer.start()
 		State.DEAD:
 			collision_shape.set_deferred("disabled", true)
+			AudioManager.play_sfx(explosion_sound, -2.0, 1.0)
 			$Sprite2D.hide()
+			$EngineSound.stop()
 			linear_velocity = Vector2.ZERO
 			dead.emit()
 	
@@ -145,10 +151,13 @@ func get_input() -> void:
 		return
 	if Input.is_action_pressed("move_forward"):
 		thrust = transform.x * engine_power
+		if not $EngineSound.playing:
+			$EngineSound.play()
 		if not gpu_particles.emitting:
 			gpu_particles.emitting = true
 			gpu_particles_2.emitting = true
 	else:
+		$EngineSound.stop()
 		if gpu_particles.emitting:
 			gpu_particles.emitting = false
 			gpu_particles_2.emitting = false
@@ -242,7 +251,8 @@ func shoot() -> void:
 	gun_cooldown.start()
 	Globals.camera.shake(0.15, 30.0, 2.0)
 	animation_player.play("shoot")
-	#spawn_muzzle_flash()
+	#$LaserSound.play()
+	AudioManager.play_sfx(laser_sound, -5.0, randf_range(0.9, 1.1))
 	var bullet: Bullet = bullet_scene.instantiate()
 	get_tree().root.add_child(bullet)
 	bullet.start(muzzle.global_transform)
@@ -305,6 +315,7 @@ func _on_invulnerability_timer_timeout() -> void:
 func _on_body_entered(body: Node) -> void:
 	if body.is_in_group("rocks"):
 		if state == State.ALIVE and not is_losing_life:
+			AudioManager.play_sfx(impact_sound, -5.0, randf_range(0.9, 1.1))
 			var damage: float = body.size * 25
 			
 			if shield - damage <= 0:

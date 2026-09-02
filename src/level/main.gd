@@ -63,6 +63,7 @@ func spawn_rock(size: float, pos = null, vel = null) -> void:
 
 
 func new_game() -> void:
+	$Music.play()
 	player.show()
 	get_tree().call_group("rocks", "queue_free")
 	level = 0
@@ -75,11 +76,13 @@ func new_game() -> void:
 
 
 func game_over() -> void:
+	$Music.stop() 
 	playing = false
 	hud.game_over()
 
 
 func new_level() -> void:
+	$LevelUpSound.play()
 	level += 1
 	hud.show_message("Wave %s" % level)
 	player.reset()
@@ -107,6 +110,7 @@ func freeze_engine(freeze_slow: float = 0.06, freeze_time: float = 0.2) -> void:
 
 
 func _on_rock_exploded(size: float, radius: float, pos: Vector2, vel: Vector2) -> void:
+	$ExplosionSound.play()
 	score += 10 * size
 	hud.update_score(score)
 	
