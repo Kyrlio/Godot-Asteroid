@@ -29,7 +29,9 @@ func _on_visible_on_screen_enabler_2d_screen_exited() -> void:
 
 func _on_body_entered(body: Node2D) -> void:
 	if body is Player:
-		body.shield -= damage
-		Globals.freeze_requested.emit(0.1, 0.2)
+		if body.state == Player.State.ALIVE and not body.is_losing_life:
+			body.shield -= damage
+			if body.state == Player.State.ALIVE and not body.is_losing_life and body.shield > 0:
+				Globals.freeze_requested.emit(0.1, 0.2)
 	spawn_hit_particles()
 	queue_free.call_deferred()

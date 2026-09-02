@@ -16,6 +16,9 @@ enum State {INIT, ALIVE, INVULNERABLE, DEAD}
 @export var muzzle_flash_particles_scene: PackedScene
 @export var bullet_scene: PackedScene
 @export var fire_rate = 0.25
+
+@export_group("Life")
+@export var max_lives: int = 3
 @export var max_shield: float = 100.0
 @export var shield_regen: float = 2.5
 
@@ -35,8 +38,9 @@ var screen_size: Vector2 = Vector2.ZERO
 var can_shoot: bool = true
 var reset_pos: bool = false
 var orbit_angle: float = 0.0
+var is_losing_life: bool = false
 
-var lives: int = 3:
+var lives: int = max_lives:
 	set(value):
 		lives = value
 		lives_changed.emit(lives)
@@ -44,7 +48,7 @@ var lives: int = 3:
 
 var shield: float = 100.0:
 	set(value):
-		if value < shield and state != State.ALIVE:
+		if (value < shield and state != State.ALIVE) or is_losing_life:
 			return
 		var clamped_val: float = clampf(value, 0.0, max_shield)
 		if is_equal_approx(shield, clamped_val): return
@@ -89,12 +93,13 @@ func _draw() -> void:
 	if state == State.DEAD: return
 	
 	var color = Color(0.902, 0.725, 0.353, 1.0)
-	var radius = 8.0
+	var radius: float = 8.0
+	var size: Vector2 =  Vector2(2.5, 2.5)
 	
 	for i in range(lives):
 		var angle = orbit_angle - rotation + (i * (TAU / max(lives, 1)))
 		var offset_pos = Vector2.RIGHT.rotated(angle) * radius
-		draw_circle(offset_pos, 1.2, color)
+		draw_rect(Rect2(offset_pos - size / 2.0, size), color)
 
 
 func change_state(new_state: State) -> void:
@@ -105,8 +110,9 @@ func change_state(new_state: State) -> void:
 			collision_shape.set_deferred("disabled", false)
 		State.INVULNERABLE:
 			#collision_shape.set_deferred("disabled", true)
-			_trigger_invincibility()
-			invulnerability_timer.start()
+			if not is_losing_life:
+				_trigger_invincibility()
+				invulnerability_timer.start()
 		State.DEAD:
 			collision_shape.set_deferred("disabled", true)
 			$Sprite2D.hide()
@@ -117,6 +123,8 @@ func change_state(new_state: State) -> void:
 
 
 func _handle_shield_depleted() -> void:
+	if is_losing_life:
+		return
 	if lives > 1:
 		change_state(State.INVULNERABLE)
 		shield = max_shield
@@ -133,7 +141,7 @@ func _handle_shield_depleted() -> void:
 
 func get_input() -> void:
 	thrust = Vector2.ZERO
-	if state in [State.DEAD, State.INIT]:
+	if state in [State.DEAD, State.INIT] or is_losing_life:
 		return
 	if Input.is_action_pressed("move_forward"):
 		thrust = transform.x * engine_power
@@ -151,14 +159,15 @@ func get_input() -> void:
 
 
 func lose_life() -> void:
-	if lives <= 0: return
+	if is_losing_life or lives <= 0: return
+	is_losing_life = true
+	Globals.is_time_scale_locked = true
+	Engine.time_scale = 1.0
 	
-	# 1. Zoom de la caméra sur le joueur (avec suivi dynamique de self)
 	if Globals.camera and is_instance_valid(Globals.camera):
 		var zoom_tween: Tween = Globals.camera.zoom_to(self, Vector2(1.8, 1.8), 0.25)
 		await zoom_tween.finished
 	
-	# 2. Calcul de la position du cercle de vie qui va se détacher
 	var target_index: int = lives - 1
 	var radius = 8.0
 	
@@ -166,49 +175,62 @@ func lose_life() -> void:
 	var local_pos: Vector2 = Vector2.RIGHT.rotated(angle) * radius
 	var global_pos: Vector2 = to_global(local_pos)
 	
-	# Décrémenter la vie pour mettre à jour l'affichage orbital
 	lives -= 1
 	lives_changed.emit(lives)
 	queue_redraw()
 	
-	# Instancier le cercle temporaire dans la scène à sa position globale (reste sur place)
 	var temp_circle = Node2D.new()
 	temp_circle.set_script(preload("uid://d14kq07auhng1"))
 	temp_circle.global_position = global_pos
 	
 	get_tree().current_scene.add_child(temp_circle)
 	
-	# 3. Lancer l'animation de perte de vie en slow motion
 	await animate_life_loss_slowmo(temp_circle)
 	
-	# 4. Retour du zoom caméra à la normale
 	if Globals.camera and is_instance_valid(Globals.camera):
 		var restore_tween: Tween = Globals.camera.restore_zoom(0.35)
 		await restore_tween.finished
+	
+	Globals.is_time_scale_locked = false
+	is_losing_life = false
+	
+	if state == State.INVULNERABLE:
+		_trigger_invincibility()
+		invulnerability_timer.start()
 
 
 func animate_life_loss_slowmo(circle_node: Node2D) -> void:
 	if not is_instance_valid(circle_node):
 		return
 	
-	Engine.time_scale = 0.5
+	Globals.is_time_scale_locked = true
+	Globals.camera.target = circle_node
+	Engine.time_scale = 0.2
 	var tween = create_tween().set_ignore_time_scale(true)
 	
-	# Grossir le cercle temporaire et le saturer vers le blanc
 	tween.set_parallel(true).set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_CUBIC)
-	tween.tween_property(circle_node, "scale", Vector2(3.0, 3.0), 0.3).set_delay(0.3)
-	#tween.tween_property(circle_node, "modulate", Color(15.934, 16.145, 15.652, 1.0), 0.5)
+	tween.tween_property(circle_node, "scale", Vector2(8.0, 8.0), 0.4).set_delay(0.5)
+	tween.tween_property(circle_node, "global_position", Globals.camera.global_position, 0.2)
+	tween.tween_property(circle_node, "rotation", circle_node.rotation + (TAU), 0.5).from(circle_node.rotation).set_delay(0.55)
 	
-	# Rétrécir jusqu'à disparaître
 	tween.set_parallel(false)
-	tween.tween_property(circle_node, "scale", Vector2.ZERO, 0.2).set_delay(0.2)
+	tween.tween_callback(func():
+		Globals.camera.shake(0.2, 40, 3)
+		var explosion: GPUParticles2D = explosion_particles_scene.instantiate()
+		explosion.global_position = Globals.camera.global_position
+		explosion.z_index = 2
+		explosion.scale = Vector2(1.8, 1.8)
+		explosion.amount *= 2
+		explosion.speed_scale = 1.0 / Engine.time_scale
+		get_tree().current_scene.add_child(explosion)
+		circle_node.queue_free()
+		)
 	
-	# Attendre la fin de l'effet
+	tween.tween_interval(0.8)
 	await tween.finished
-	await get_tree().create_timer(0.3).timeout
 	
-	# Rétablir le temps et détruire le nœud d'effet
 	Engine.time_scale = 1.0
+	Globals.camera.target = self
 	if is_instance_valid(circle_node):
 		circle_node.queue_free()
 
@@ -248,9 +270,12 @@ func reset() -> void:
 	for child in get_children():
 		if child is LiveCircle:
 			child.queue_free()
-	lives = 3
+	if lives < max_lives:
+		lives += 1
 	shield = max_shield
 	Engine.time_scale = 1.0
+	is_losing_life = false
+	Globals.is_time_scale_locked = false
 	if Globals.camera and is_instance_valid(Globals.camera):
 		Globals.camera.reset_camera()
 	change_state(State.ALIVE)
@@ -272,11 +297,20 @@ func _on_gun_cooldown_timeout() -> void:
 
 
 func _on_invulnerability_timer_timeout() -> void:
+	if is_losing_life:
+		return
 	change_state(State.ALIVE)
 
 
 func _on_body_entered(body: Node) -> void:
 	if body.is_in_group("rocks"):
-		if state == State.ALIVE:
-			shield -= body.size * 25
-			body.explode()
+		if state == State.ALIVE and not is_losing_life:
+			var damage: float = body.size * 25
+			
+			if shield - damage <= 0:
+				var delay_timer := get_tree().create_timer(1.0, true, false, true)
+				delay_timer.timeout.connect(func(): if is_instance_valid(body): body.explode())
+			else:
+				body.explode()
+			
+			shield -= damage

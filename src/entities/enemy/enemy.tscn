@@ -33,6 +33,18 @@ tracks/1/keys = {
 "update": 0,
 "values": [0.0]
 }
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("Sprite2D:scale")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(1, 1)]
+}
 
 [sub_resource type="Animation" id="Animation_gdlib"]
 resource_name = "default"
@@ -118,6 +130,7 @@ process_mode = 1
 script = ExtResource("1_w1tau")
 explosion_particle_scene = ExtResource("2_yu70o")
 bullet_scene = ExtResource("3_y6j3k")
+number_bullet = 5
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=1480673883]
 libraries/ = SubResource("AnimationLibrary_j4a4q")

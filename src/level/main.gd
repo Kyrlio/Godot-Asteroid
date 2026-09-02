@@ -88,12 +88,21 @@ func new_level() -> void:
 		spawn_rock(3)
 
 
+var _freeze_token: int = 0
+
 func freeze_engine(freeze_slow: float = 0.06, freeze_time: float = 0.2) -> void:
-	if Engine.time_scale != 1.0:
+	if Globals.is_time_scale_locked or Engine.time_scale != 1.0:
 		return
+	
+	_freeze_token += 1
+	var token: int = _freeze_token
 	
 	Engine.time_scale = freeze_slow
 	await get_tree().create_timer(freeze_time * freeze_slow).timeout
+	
+	if Globals.is_time_scale_locked or _freeze_token != token or Engine.time_scale != freeze_slow:
+		return
+	
 	Engine.time_scale = 1.0
 
 

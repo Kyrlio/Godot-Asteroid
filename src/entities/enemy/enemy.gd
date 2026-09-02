@@ -6,9 +6,13 @@ extends Area2D
 @export var speed: int = 25
 @export var health: int = 3
 @export var bullet_spread: float = 0.2
+@export var number_bullet: int = 1
+
+@onready var sprite: Sprite2D = $Sprite2D
 
 var follow: PathFollow2D = PathFollow2D.new()
 var target: Player = null
+var shoot_tween: Tween
 
 #Hitstop
 var hitstop_frames: int = 0
@@ -41,7 +45,19 @@ func shoot() -> void:
 	dir = dir.rotated(randf_range(-bullet_spread, bullet_spread))
 	var bullet: EnemyBullet = bullet_scene.instantiate()
 	get_tree().root.add_child(bullet)
+	play_shoot_animation()
 	bullet.start(global_position, dir)
+
+
+func play_shoot_animation() -> void:
+	if shoot_tween and shoot_tween.is_running():
+		shoot_tween.kill()
+	
+	shoot_tween = create_tween().set_trans(Tween.TRANS_CUBIC)
+	shoot_tween.tween_property(sprite, "scale", Vector2(1.5, 0.835), 0.1).from(Vector2.ONE)
+	shoot_tween.tween_property(sprite, "scale", Vector2(0.628, 1.165), 0.1)
+	shoot_tween.tween_property(sprite, "scale", Vector2.ONE, 0.2)
+
 
 
 func shoot_pulse(n: int, delay: float) -> void:
@@ -88,12 +104,13 @@ func spawn_explosion_particles() -> void:
 
 
 func _on_gun_cooldown_timeout() -> void:
-	shoot_pulse(3, 0.15)
+	shoot_pulse(number_bullet, 0.15)
 
 
 func _on_body_entered(body: Node2D) -> void:
 	if body.is_in_group("rocks"):
 		return
 	if body is Player:
-		body.shield -= 50
+		if body.state == Player.State.ALIVE and not body.is_losing_life:
+			body.shield -= 50
 		explode()
